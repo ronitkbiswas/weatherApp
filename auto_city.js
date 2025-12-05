@@ -44,7 +44,7 @@ if (navigator.geolocation) {
         <h3>${fullTime} | ${temp}°C</h3>
         <h3>${desc}</h3>
       `;
-
+console.log(`${city}`);
       // Optional: change background based on weather
       if (desc.includes("haze")) {
         document.body.style.backgroundColor = "lightgrey";

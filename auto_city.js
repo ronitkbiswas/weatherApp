@@ -6,26 +6,28 @@ if (navigator.geolocation) {
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
 
+    console.log("Lat:", lat, "Lon:", lon);
+
     try {
-      // 🔹 Directly fetch weather using lat/lon (works for Ghuni or any local place)
+      // 🔹 Use lat/lon directly – no city name
       const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
       const weatherRes = await fetch(url);
       if (!weatherRes.ok) {
         result.textContent = "Weather not found for this location";
+        console.log("OpenWeather status:", weatherRes.status);
         return;
       }
 
       const weatherData = await weatherRes.json();
 
-      // City name from OpenWeather (usually English, e.g. "Kolkata")
       const city = weatherData.name || "Your location";
-      console.log("Detected city:", city);
+      console.log("OpenWeather city:", city);
 
       const temp = weatherData.main.temp;
       const desc = weatherData.weather[0].description;
-      const now = new Date();
 
+      const now = new Date();
       let hours = now.getHours();
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const ampm = hours >= 12 ? "PM" : "AM";
@@ -38,7 +40,6 @@ if (navigator.geolocation) {
         <h3>${desc}</h3>
       `;
 
-      // Background change based on weather
       if (desc.includes("haze")) {
         document.body.style.backgroundColor = "lightgrey";
       } else if (desc.includes("cloud")) {
@@ -46,7 +47,6 @@ if (navigator.geolocation) {
       } else if (desc.includes("clear")) {
         document.body.style.backgroundColor = "skyblue";
       }
-
     } catch (err) {
       result.textContent = "Something went wrong!";
       console.error(err);

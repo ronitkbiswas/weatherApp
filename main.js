@@ -76,7 +76,7 @@ if (navigator.geolocation) {
 
       const weatherRes = await fetch(url);
       if (!weatherRes.ok) {
-        result.textContent = "This city not found! Try with another city";
+        result.textContent = "Enter a City and Check weather !";
         return;
       }
 

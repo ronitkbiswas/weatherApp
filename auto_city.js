@@ -7,27 +7,21 @@ if (navigator.geolocation) {
     const lon = position.coords.longitude;
 
     try {
-      // Get city from coordinates
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-      );
-      const data = await res.json();
-      const city =
-        data.address.city || data.address.town || data.address.village;
-      console.log("Detected city:", city);
-
-      // Now fetch weather for that city
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
-        city
-      )}&appid=${apiKey}&units=metric`;
+      // 🔹 Directly fetch weather using lat/lon (works for Ghuni or any local place)
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
 
       const weatherRes = await fetch(url);
       if (!weatherRes.ok) {
-        result.textContent = "This city not found! Try with another city";
+        result.textContent = "Weather not found for this location";
         return;
       }
 
       const weatherData = await weatherRes.json();
+
+      // City name from OpenWeather (usually English, e.g. "Kolkata")
+      const city = weatherData.name || "Your location";
+      console.log("Detected city:", city);
+
       const temp = weatherData.main.temp;
       const desc = weatherData.weather[0].description;
       const now = new Date();
@@ -36,7 +30,6 @@ if (navigator.geolocation) {
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const ampm = hours >= 12 ? "PM" : "AM";
       hours = hours % 12 || 12;
-
       const fullTime = `${hours}:${minutes} ${ampm}`;
 
       result.innerHTML = `
@@ -44,8 +37,8 @@ if (navigator.geolocation) {
         <h3>${fullTime} | ${temp}°C</h3>
         <h3>${desc}</h3>
       `;
-console.log(`${city}`);
-      // Optional: change background based on weather
+
+      // Background change based on weather
       if (desc.includes("haze")) {
         document.body.style.backgroundColor = "lightgrey";
       } else if (desc.includes("cloud")) {
@@ -53,6 +46,7 @@ console.log(`${city}`);
       } else if (desc.includes("clear")) {
         document.body.style.backgroundColor = "skyblue";
       }
+
     } catch (err) {
       result.textContent = "Something went wrong!";
       console.error(err);

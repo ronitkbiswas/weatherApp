@@ -11,13 +11,17 @@
       sizes="32x32"
       href="https://cdn-icons-png.flaticon.com/512/19015/19015169.png"
     />
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+    <!-- <script src="main.js"></script> -->
   </head>
   <body>
     <center>
-      <p id="auto_city"></p>
+      <h3>Weather App (v1.0)</h3>
+      <input type="text" id="cityIp" placeholder="Type a city..." />
+      <br /><br />
+      <button type="button" id="getWeatherBtn">Check Weather</button>
       <p id="result">Enter a City and Check weather !</p>
+      <p id="auto_city"></p>
+
       <script src="auto_city.js"></script>
     </center>
   </body>

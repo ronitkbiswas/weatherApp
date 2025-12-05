@@ -1,4 +1,8 @@
 # 🌤️ Simple JavaScript Weather App
+## 📸 Preview
+https://ronitkbiswas.github.io/weatherApp/
+
+---
 
 A lightweight and responsive **JavaScript-based weather app** that fetches real-time weather data
 from the [OpenWeatherMap API]
@@ -64,11 +68,6 @@ weather-app/
    ```
 
 4. Enter any city name and hit **Get Weather**! 🌦️
-
----
-
-## 📸 Preview
-https://ronitkbiswas.github.io/weatherApp/
 
 ---
 

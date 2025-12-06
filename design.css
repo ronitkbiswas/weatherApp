@@ -1,0 +1,15 @@
+body {
+  font-family: cursive;
+}
+.heading {
+  font-size: 30px;
+}
+#cityIp {
+  padding: 5px 20px;
+  font-size: 17px;
+}
+#getWeatherBtn {
+  padding: 5px 20px;
+  font-size: 17px;
+  border-radius: 5px;
+}

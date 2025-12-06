@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     result.innerHTML = `
       <h2>${city} ${emoji}</h2>
-      <h3>${fullTime} | ${temp}°C</h3>
+      <h3>${fullTime} ~ ${temp.toFixed(1)}°C</h3>
       <h3>${desc}</h3>
     `;
   }
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch(url);
       if (!res.ok) {
-        result.textContent = "This city not found! Try another city.";
+        result.textContent = "Not found! Try another city...";
         return;
       }
 
@@ -124,10 +124,10 @@ function setWeatherTheme(desc) {
     bg = "#87CEEB"; // sky blue
     emoji = "☀️";
   } else if (d.includes("few clouds")) {
-    bg = "#c3c9cbff"; // light sky blue
+    bg = "#C0C0C0"; // light sky blue
     emoji = "☁️";
   } else if (d.includes("scattered clouds")) {
-    bg = "#B0C4DE"; // light steel blue
+    bg = "#C0C0C0"; // light steel blue
     emoji = "🌥️";
   } else if (d.includes("broken clouds") || d.includes("overcast")) {
     bg = "#778899"; // grayish

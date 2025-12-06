@@ -4,34 +4,12 @@ const result = document.getElementById("result");
 const cityIp = document.getElementById("cityIp");
 const btn = document.getElementById("getWeatherBtn");
 
-  // ---------- Helpers ----------
-  // function setBackground(desc) {
-  //   const d = desc.toLowerCase();
-  //   if (d.includes("haze")) {
-  //     document.body.style.backgroundColor = "lightgrey";
-  //   } else if (d.includes("cloud")) {
-  //     document.body.style.backgroundColor = "grey";
-  //   } else if (d.includes("clear")) {
-  //     document.body.style.backgroundColor = "skyblue";
-  //   } else {
-  //     document.body.style.backgroundColor = "white";
-  //   }
-  // }
-
-  function renderWeather(city, temp, desc) {
-    const now = new Date();
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    const fullTime = `${hours}:${minutes} ${ampm}`;
-    const emoji = setWeatherTheme(desc);
-
-    result.innerHTML = `
-      <h2>${city} ${emoji}</h2>
-      <h3>${fullTime} ~ ${temp.toFixed(1)}°C</h3>
-      <h3>${desc}</h3>
-    `;
+// Manual city search
+btn.addEventListener("click", async () => {
+  const city = cityIp.value.trim();
+  if (!city) {
+    result.textContent = "Enter a city please!";
+    return;
   }
 
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
@@ -58,7 +36,11 @@ const btn = document.getElementById("getWeatherBtn");
     const fullTime = `${hours}:${minutes} ${ampm}`;
 
     result.innerHTML = `
+<<<<<<< HEAD
       <h2>${name}</h2>
+=======
+      <h2>${city} ${emoji}</h2>
+>>>>>>> 81966663be803bf1285c037506f1118318115232
       <h3>${fullTime} ~ ${temp.toFixed(0)}°C</h3>
       <h3>${desc}</h3>
     `;

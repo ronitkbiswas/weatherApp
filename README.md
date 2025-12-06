@@ -1,33 +1,12 @@
 # 🌤️ Simple JavaScript Weather App
-## 📸 Preview
+## 📸 Live Preview
 https://ronitkbiswas.github.io/weatherApp/
 
 ---
-
 A lightweight and responsive **JavaScript-based weather app** that fetches real-time weather data
 from the [OpenWeatherMap API]
 Built using **HTML, CSS, and JS**, 
 this project demonstrates how to work with APIs, async functions, and DOM manipulation in JavaScript.
-
-
-## 🚀 Features
-
-* Search weather by **city name**
-* Displays **temperature, weather condition, and humidity**
-* Uses **OpenWeatherMap API** for accurate real-time data
-* Simple and clean **UI design**
-* Fully built with **vanilla JavaScript** (no frameworks)
-
----
-
-## 🧠 Tech Stack
-
-* **HTML5** – structure
-* **CSS3** – basic styling
-* **JavaScript (ES6)** – logic and API calls
-* **OpenWeatherMap API** – weather data provider
-
----
 
 ## ⚙️ How It Works
 
@@ -38,25 +17,13 @@ this project demonstrates how to work with APIs, async functions, and DOM manipu
 
 ---
 
-## 🧩 Project Structure
-
-```
-weather-app/
-│
-├── index.html      # Main UI file
-├── main.js         # JavaScript logic and API integration
-└── README.md       # Project documentation
-```
-
----
-
 ## 🔑 Setup & Usage
 
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/ronitkbiswas/weather-app.git
-   cd weather-app
+   git clone https://github.com/ronitkbiswas/weatherApp.git
+   cd weatherApp
    ```
 
 2. Open `index.html` in your browser.

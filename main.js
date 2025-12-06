@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     result.innerHTML = `
       <h2>${city} ${emoji}</h2>
-      <h3>${fullTime} ~ ${temp.toFixed(1)}°C</h3>
+      <h3>${fullTime} ~ ${temp.toFixed(0)}°C</h3>
       <h3>${desc}</h3>
     `;
   }

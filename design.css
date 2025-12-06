@@ -1,8 +1,8 @@
 body {
-  font-family: cursive;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 .heading {
-  font-size: 30px;
+  font-size: 27px;
 }
 #cityIp {
   padding: 5px 20px;

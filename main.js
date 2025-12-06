@@ -1,5 +1,5 @@
 const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
-
+const auto_city = document.getElementById("auto_city");
 const result = document.getElementById("result");
 const cityIp = document.getElementById("cityIp");
 const btn = document.getElementById("getWeatherBtn");
@@ -36,11 +36,7 @@ btn.addEventListener("click", async () => {
     const fullTime = `${hours}:${minutes} ${ampm}`;
 
     result.innerHTML = `
-<<<<<<< HEAD
       <h2>${name}</h2>
-=======
-      <h2>${city} ${emoji}</h2>
->>>>>>> 81966663be803bf1285c037506f1118318115232
       <h3>${fullTime} ~ ${temp.toFixed(0)}°C</h3>
       <h3>${desc}</h3>
     `;
@@ -52,7 +48,7 @@ btn.addEventListener("click", async () => {
 
 // Auto location on page load
 if (navigator.geolocation) {
-  result.textContent = "Detecting your location...";
+  auto_city.textContent = "Detecting your location.....";
   navigator.geolocation.getCurrentPosition(
     async (position) => {
       const lat = position.coords.latitude;
@@ -78,11 +74,15 @@ if (navigator.geolocation) {
         const ampm = hours >= 12 ? "PM" : "AM";
         hours = hours % 12 || 12;
         const fullTime = `${hours}:${minutes} ${ampm}`;
-
-        result.innerHTML = `
-          <h2>${city}</h2>
-          <h3>${fullTime} ~ ${temp.toFixed(0)}°C</h3>
-          <h3>${desc}</h3>
+        auto_city.innerHTML = `
+        <span style='color:green;'>Your current location: </span>
+        <br><br>
+          <span style='font-size:20px'>${city}</span><br><br>
+          <span style='font-size:20px'><b>${fullTime}</b> ~ <b>${temp.toFixed(
+          0
+        )}°C</b></span>
+        <br><br>
+          <span>${desc}</span>
         `;
       } catch (err) {
         console.error(err);

@@ -66,7 +66,7 @@ if (navigator.geolocation) {
         const data = await res.json();
         const temp = data.main.temp;
         const desc = data.weather[0].description;
-        const city = data.name || "Your location";
+        const city = data.name || "Your current location";
 
         const now = new Date();
         let hours = now.getHours();
@@ -75,7 +75,7 @@ if (navigator.geolocation) {
         hours = hours % 12 || 12;
         const fullTime = `${hours}:${minutes} ${ampm}`;
         auto_city.innerHTML = `
-        <span style='color:green;'>Your current location: </span>
+        <span style='color:darkgreen;font-weight:500;'>Your current location</span>
         <br><br>
           <span style='font-size:20px'>${city}</span><br><br>
           <span style='font-size:20px'><b>${fullTime}</b> ~ <b>${temp.toFixed(

@@ -1,10 +1,12 @@
 .heading {
-  font-size: 27px;
+  font-size: 25px;
+  color: rgb(29, 23, 83);
 }
 #cityIp {
   padding: 5px 20px;
   font-size: 17px;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-weight: 900;
 }
 #getWeatherBtn {
@@ -20,7 +22,7 @@ body {
 }
 
 .uD {
-  background-color: #c6c4c4; /* light grey (you can change) */
+  background-color: #aca9a9; /* light grey (you can change) */
   padding: 2px;
   box-sizing: border-box;
 }
@@ -30,11 +32,11 @@ body {
   padding: 2px;
   box-sizing: border-box;
 }
-#result {
-  color: rgb(41, 41, 41);
+/* #result {
+  color: rgb(70, 71, 71);
   font-size: 16px;
   font-weight: 1000;
-}
+} */
 .hidden {
   display: none;
 }

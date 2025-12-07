@@ -11,7 +11,7 @@ btn.addEventListener("click", async () => {
     result.textContent = "Enter a city please!";
     return;
   }
-
+  document.getElementById("myImage").classList.remove("hidden");
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
     city
   )}&appid=${apiKey}&units=metric`;
@@ -36,13 +36,16 @@ btn.addEventListener("click", async () => {
     const fullTime = `${hours}:${minutes} ${ampm}`;
 
     result.innerHTML = `
-      <h2>${name}</h2>
-      <h3>${fullTime} ~ ${temp.toFixed(0)}°C</h3>
-      <h3>${desc}</h3>
+      <span style='font-size:22px'>${name}</span><br>
+          <span style='font-size:14px'>${fullTime}</span><br><br>
+          <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
+        <br><br>
+          <span>${desc}</span>
     `;
+    document.getElementById("myImage").classList.add("hidden");
   } catch (err) {
     console.error(err);
-    result.textContent = "Something went wrong!";
+    result.textContent = "Something went wrong! ERROR 404";
   }
 });
 
@@ -78,10 +81,9 @@ if (navigator.geolocation) {
         auto_city.innerHTML = `
         <span style='color:darkgreen;font-weight:500;'>Your current location</span>
         <br><br>
-          <span style='font-size:20px'>${city}</span><br><br>
-          <span style='font-size:20px'><b>${fullTime}</b> ~ <b>${temp.toFixed(
-          0
-        )}°C</b></span>
+          <span style='font-size:22px'>${city}</span><br>
+          <span style='font-size:14px'>${fullTime}</span><br><br>
+          <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
         <br><br>
           <span>${desc}</span>
         `;

@@ -16,10 +16,11 @@ body {
   margin: 0;
   padding: 0;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  background-color: #bebdbd;
 }
 
 .uD {
-  background-color: #bebdbd; /* light grey (you can change) */
+  background-color: #c6c4c4; /* light grey (you can change) */
   padding: 2px;
   box-sizing: border-box;
 }
@@ -33,4 +34,7 @@ body {
   color: rgb(41, 41, 41);
   font-size: 16px;
   font-weight: 1000;
+}
+.hidden {
+  display: none;
 }

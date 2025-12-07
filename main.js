@@ -48,6 +48,7 @@ btn.addEventListener("click", async () => {
 
 // Auto location on page load
 if (navigator.geolocation) {
+  document.getElementById("myImage").classList.remove("hidden");
   auto_city.textContent = "Detecting your location.....";
   navigator.geolocation.getCurrentPosition(
     async (position) => {
@@ -84,6 +85,7 @@ if (navigator.geolocation) {
         <br><br>
           <span>${desc}</span>
         `;
+        document.getElementById("myImage").classList.add("hidden");
       } catch (err) {
         console.error(err);
         result.textContent = "Something went wrong with auto location!";

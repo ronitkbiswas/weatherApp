@@ -11,7 +11,7 @@ btn.addEventListener("click", async () => {
     result.textContent = "Enter a city please!";
     return;
   }
-  document.getElementById("myImage").classList.remove("hidden");
+  document.getElementById("myImageUp").classList.remove("hidden");
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
     city
   )}&appid=${apiKey}&units=metric`;
@@ -42,7 +42,7 @@ btn.addEventListener("click", async () => {
         <br><br>
           <span>${desc}</span>
     `;
-    document.getElementById("myImage").classList.add("hidden");
+    document.getElementById("myImageUp").classList.add("hidden");
   } catch (err) {
     console.error(err);
     result.textContent = "Something went wrong! ERROR 404";

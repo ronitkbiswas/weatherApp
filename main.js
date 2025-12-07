@@ -25,19 +25,41 @@ btn.addEventListener("click", async () => {
 
     const data = await res.json();
     const temp = data.main.temp;
-    const desc = data.weather[0].description;
+    let desc = data.weather[0].description;
     const name = data.name || city;
 
-    const now = new Date();
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    const fullTime = `${hours}:${minutes} ${ampm}`;
+    let now = new Date();
+    let hours24 = now.getHours(); // 0–23 (keep this for conditions)
+    let minutes = now.getMinutes();
+    let ampm = hours24 >= 12 ? "PM" : "AM";
 
+    // convert only for display
+    let hours12 = hours24 % 12 || 12;
+    let fullTime = `${hours12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+    //console.log(fullTime);
+    // time ranges
+    //Time Range (24-hr)	Period Shown
+    //05:00(5am) → 11:59(am)	 Morning
+    //12:00(12pm) → 15:59(4pm) Noon
+    //16:00 (4pm) → 18:59(7pm)	Evening
+    // 19:00(7pm) → 04:59(5am) Night
+    if (hours24 >= 5 && hours24 < 12) {
+      let g = "🌅 Morning";
+    } else if (hours24 >= 12 && hours24 < 16) {
+      g = "☀️ Noon";
+    } else if (hours24 >= 16 && hours24 < 19) {
+      g = "🌇 Evening";
+    } else {
+      g = "🌙 Night";
+    }
+    if (desc === "clear sky") {
+      desc = "Sky is clear! Enjoy the vive ! 🏙️";
+    } else if (desc === "haze") {
+      desc = "Cold hazy day with a greyish vive ! ☁️";
+    }
     result.innerHTML = `
       <span style='font-size:22px'>${name}</span><br>
-          <span style='font-size:14px'>${fullTime}</span><br><br>
+          <span style='font-size:14px'>${fullTime}</span>| <span>${g}</span><br><br>
           <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
         <br><br>
           <span>${desc}</span>
@@ -48,8 +70,11 @@ btn.addEventListener("click", async () => {
     result.textContent = "Something went wrong! ERROR 404";
   }
 });
+/////////////////////////////////////////////////////////////////
 
 // Auto location on page load
+
+////////////////////////////////////////////////////////////////
 if (navigator.geolocation) {
   document.getElementById("myImage").classList.remove("hidden");
   auto_city.textContent = "Detecting your location.....";
@@ -69,20 +94,46 @@ if (navigator.geolocation) {
 
         const data = await res.json();
         const temp = data.main.temp;
-        const desc = data.weather[0].description;
+        let desc = data.weather[0].description;
         const city = data.name || "Your current location";
 
-        const now = new Date();
-        let hours = now.getHours();
-        const minutes = now.getMinutes().toString().padStart(2, "0");
-        const ampm = hours >= 12 ? "PM" : "AM";
-        hours = hours % 12 || 12;
-        const fullTime = `${hours}:${minutes} ${ampm}`;
+        let now = new Date();
+        let hours24 = now.getHours(); // 0–23 (keep this for conditions)
+        let minutes = now.getMinutes();
+        let ampm = hours24 >= 12 ? "PM" : "AM";
+
+        // convert only for display
+        let hours12 = hours24 % 12 || 12;
+        let fullTime = `${hours12}:${minutes
+          .toString()
+          .padStart(2, "0")} ${ampm}`;
+        //console.log(fullTime);
+        // time ranges
+        //Time Range (24-hr)	Period Shown
+        //05:00(5am) → 11:59(am)	 Morning
+        //12:00(12pm) → 15:59(4pm) Noon
+        //16:00 (4pm) → 18:59(7pm)	Evening
+        // 19:00(7pm) → 04:59(5am) Night
+        if (hours24 >= 5 && hours24 < 12) {
+          let g = "🌅 Morning";
+        } else if (hours24 >= 12 && hours24 < 16) {
+          g = "☀️ Noon";
+        } else if (hours24 >= 16 && hours24 < 19) {
+          g = "🌇 Evening";
+        } else {
+          g = "🌙 Night";
+        }
+        console.log(typeof desc);
+        if (desc === "clear sky") {
+          desc = "Sky is clear! Enjoy the vive ! 🏙️";
+        } else if (desc === "haze") {
+          desc = "Cold hazy day with a greyish vive ! ☁️";
+        }
         auto_city.innerHTML = `
         <span style='color:darkgreen;font-weight:500;'>Your current location</span>
         <br><br>
           <span style='font-size:22px'>${city}</span><br>
-          <span style='font-size:14px'>${fullTime}</span><br><br>
+          <span style='font-size:14px'>${fullTime}</span>| <span>${g}</span><br><br>
           <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
         <br><br>
           <span>${desc}</span>

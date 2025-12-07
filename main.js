@@ -59,7 +59,7 @@ btn.addEventListener("click", async () => {
     }
     result.innerHTML = `
       <span style='font-size:22px'>${name}</span><br>
-          <span style='font-size:14px'>${fullTime}</span>| <span>${g}</span><br><br>
+          <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br><br>
           <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
         <br><br>
           <span>${desc}</span>
@@ -133,7 +133,7 @@ if (navigator.geolocation) {
         <span style='color:darkgreen;font-weight:500;'>Your current location</span>
         <br><br>
           <span style='font-size:22px'>${city}</span><br>
-          <span style='font-size:14px'>${fullTime}</span>| <span>${g}</span><br><br>
+          <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br><br>
           <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
         <br><br>
           <span>${desc}</span>

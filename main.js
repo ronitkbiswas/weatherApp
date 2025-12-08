@@ -51,10 +51,12 @@ btn.addEventListener("click", async () => {
     } else {
       g = "🌙 Night";
     }
-    if (desc === "clear sky") {
-      desc = "Sky is clear! Enjoy the vive ! 🏙️";
+    if (desc === "clear sky" && g === "🌙 Night") {
+      desc = "Night Sky is clear! Enjoy the vive ! 🏙️";
     } else if (desc === "haze") {
       desc = "Cold hazy day with a greyish vive ! ☁️";
+    } else if (desc === "overcast clouds" && g === "🌙 Night") {
+      desc = "Cold hazy night with overcast clouds in the sky! ☁️";
     }
     result.innerHTML = `
       <span style='font-size:22px'>${name}</span><br>
@@ -122,11 +124,12 @@ if (navigator.geolocation) {
         } else {
           g = "🌙 Night";
         }
-        console.log(typeof desc);
-        if (desc === "clear sky") {
-          desc = "Sky is clear! Enjoy the vive ! 🏙️";
+        if (desc === "clear sky" && g === "🌙 Night") {
+          desc = "Night Sky is clear! Enjoy the vive ! 🏙️";
         } else if (desc === "haze") {
           desc = "Cold hazy day with a greyish vive ! ☁️";
+        } else if (desc === "overcast clouds" && g === "🌙 Night") {
+          desc = "Cold hazy night with overcast clouds in the sky! ☁️ 🍂";
         }
         auto_city.innerHTML = `
         <span style='color:darkgreen;font-weight:500;'>Your current location</span>

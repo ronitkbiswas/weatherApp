@@ -13,22 +13,23 @@
   padding: 5px 20px;
   font-size: 17px;
   border-radius: 5px;
+  box-shadow: 2px 2px 5px green;
 }
 body {
   margin: 0;
   padding: 0;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  background-color: #bebdbd;
+  background-color: #7f7e7e;
 }
 
 .uD {
-  background-color: #aca9a9; /* light grey (you can change) */
+  background-color: #858484;
   padding: 2px;
   box-sizing: border-box;
 }
 
 .lD {
-  background-color: rgb(226, 225, 225);
+  background-color: rgb(145, 144, 144);
   padding: 2px;
   box-sizing: border-box;
 }

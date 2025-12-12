@@ -23,7 +23,10 @@
 
       <p id="localTime" style="font-size: 20px;">--:--</p>
 
-      <p id="sunEvent" style="font-size: 18px;"></p>
+      <div id="sunTimes" style="font-size: 16px;">
+          <p id="sunriseTime"></p>
+          <p id="sunsetTime"></p>
+      </div>
 
       <h3 id="currentWeather"></h3>
       <p id="temperature"></p>
@@ -92,7 +95,7 @@
         return summary + emojis;
       }
 
-      // --- REWRITTEN displayLocalTime FUNCTION ---
+      // --- REWRITTEN displayLocalTime FUNCTION (Simplified) ---
       function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
         if (localTimeInterval) {
             clearInterval(localTimeInterval);
@@ -100,30 +103,28 @@
 
         const timeElement = document.getElementById("localTime");
         const summaryElement = document.getElementById("weatherSummary");
-        const sunEventElement = document.getElementById("sunEvent");
-        
+        const sunriseElement = document.getElementById("sunriseTime");
+        const sunsetElement = document.getElementById("sunsetTime");
+
+        // Get initial weather values for summary generation
         const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
+
         function updateClock() {
-            // --- CRITICAL FIX APPLIED HERE ---
-            // 1. Get the current UTC time in milliseconds. (Date.now() is always UTC epoch time)
+            // 1. Get the current UTC time in milliseconds.
             const utcMs = Date.now(); 
             
             // 2. Calculate the remote local time (milliseconds) by adding the location's offset
-            // timezoneOffsetSeconds is the difference from UTC (e.g., IST is +19800 seconds)
             const localTimeMs = utcMs + (timezoneOffsetSeconds * 1000);
             
             const localDate = new Date(localTimeMs);
             const currentSecondUTC = Math.floor(localTimeMs / 1000); 
-            // --- END CRITICAL FIX ---
 
-
-            // Determine if it is night (current time is after sunset OR before sunrise)
+            // Determine if it is night 
             const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
 
             // --- 1. Update Time Display ---
-            // Use localDate and format it based on the remote offset
             const timeOptions = { 
                 hour: '2-digit', 
                 minute: '2-digit', 
@@ -142,45 +143,28 @@
             const dateString = localDate.toLocaleDateString('en-US', dateOptions);
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // --- 2. Update Sun Event Countdown ---
-            let nextEventTime, eventName, emoji;
-
-            if (currentSecondUTC < sunsetTime) {
-                // If before sunset, the next event is sunset (today)
-                eventName = "Sunset";
-                emoji = "🌇";
-                nextEventTime = sunsetTime;
-            } else {
-                // If after sunset, the next event is sunrise (tomorrow)
-                eventName = "Sunrise";
-                emoji = "🌅";
-                nextEventTime = sunriseTime + 86400; // Add 24 hours (86400 seconds)
-            }
-
-            // Calculate the time difference (in milliseconds)
-            const diffMs = (nextEventTime * 1000) - localTimeMs;
-
-            if (diffMs > 0) {
-                const diffSeconds = Math.floor(diffMs / 1000);
-                const hours = Math.floor(diffSeconds / 3600);
-                const minutes = Math.floor((diffSeconds % 3600) / 60);
-
-                const nextEventDate = new Date(nextEventTime * 1000);
-                const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
-
-                sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins: ${eventTimeString}`;
-            } else {
-                 const nextEventDate = new Date(nextEventTime * 1000);
-                 const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
-                sunEventElement.textContent = `${emoji} ${eventName} is happening now at ${eventTimeString}!`;
-            }
-
-            // --- 3. Update Custom Summary ---
+            // --- 2. Update Custom Summary ---
             if (!isNaN(temp)) {
                 summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
             }
+            
+            // NOTE: The static sunrise/sunset display is handled outside this loop (in displayLocalTime) 
+            // because those values do not change every second.
         }
         
+        // --- STATIC SUN TIME DISPLAY (Executed once on data load) ---
+        const sunriseDate = new Date(sunriseTime * 1000);
+        const sunsetDate = new Date(sunsetTime * 1000);
+        
+        const sunTimeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+
+        const formattedSunrise = sunriseDate.toLocaleTimeString('en-US', sunTimeOptions);
+        const formattedSunset = sunsetDate.toLocaleTimeString('en-US', sunTimeOptions);
+
+        sunriseElement.textContent = `🌅 Sunrise: ${formattedSunrise}`;
+        sunsetElement.textContent = `🌇 Sunset: ${formattedSunset}`;
+
+        // Start the clock updates
         updateClock();
         localTimeInterval = setInterval(updateClock, 1000);
       }
@@ -197,7 +181,7 @@
             const timezone = data.timezone; 
             
             // Sunrise/Sunset times are UTC seconds. We add the timezone offset to get the 
-            // UTC-equivalent time in the local timezone (Crucial for comparison).
+            // UTC-equivalent time in the local timezone (Crucial for display).
             const sunriseTime = data.sys.sunrise + timezone; 
             const sunsetTime = data.sys.sunset + timezone; 
 
@@ -211,7 +195,8 @@
             document.getElementById("currentWeather").textContent = "";
             document.getElementById("localTime").textContent = "--:--";
             document.getElementById("weatherSummary").textContent = "";
-            document.getElementById("sunEvent").textContent = "";
+            document.getElementById("sunriseTime").textContent = "";
+            document.getElementById("sunsetTime").textContent = "";
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
@@ -220,7 +205,7 @@
         }
       }
 
-      // --- LOCATION & AQI FETCHING ---
+      // --- LOCATION & AQI FETCHING (UNCHANGED) ---
 
       async function getLocationName(lat, lon) {
         const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
@@ -268,7 +253,7 @@
       }
 
 
-      // --- USER INPUT HANDLER ---
+      // --- USER INPUT HANDLER (UNCHANGED) ---
 
       async function getCoordinatesByCityName(cityName) {
         const encodedCity = encodeURIComponent(cityName);

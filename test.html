@@ -118,17 +118,31 @@
             // Determine if it is night (current time is after sunset OR before sunrise)
             const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
 
-            // --- 1. Update Time Display ---
-            const timeString = localDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
-            const dateString = localDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+            // --- 1. Update Time Display (FIXED METHOD) ---
+            // Use localDate and format it based on the remote offset
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: true, 
+                timeZone: 'UTC' // Use UTC as the date object is already shifted
+            };
+            const dateOptions = { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric', 
+                timeZone: 'UTC' 
+            };
+            
+            const timeString = localDate.toLocaleTimeString('en-US', timeOptions);
+            const dateString = localDate.toLocaleDateString('en-US', dateOptions);
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // --- 2. Update Sun Event Countdown (FIXED LOGIC) ---
+            // --- 2. Update Sun Event Countdown ---
             let nextEventTime, eventName, emoji;
 
             // Check if current time is before TODAY's sunset
             if (currentSecondUTC < sunsetTime) {
-                // If before sunset, the next event is sunset
                 eventName = "Sunset";
                 emoji = "🌇";
                 nextEventTime = sunsetTime;
@@ -136,8 +150,7 @@
                 // If after sunset, the next event is TOMORROW's sunrise
                 eventName = "Sunrise";
                 emoji = "🌅";
-                // Add 24 hours (86400 seconds) to today's sunrise time
-                nextEventTime = sunriseTime + 86400; 
+                nextEventTime = sunriseTime + 86400; // Add 24 hours (86400 seconds)
             }
 
             // Calculate the time difference in milliseconds
@@ -198,6 +211,7 @@
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
+          document.getElementById("status").textContent = "Error fetching weather data.";
           console.error("Error fetching weather data:", err);
         }
       }

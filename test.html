@@ -23,7 +23,7 @@
 
       <p id="localTime" style="font-size: 20px;">--:--</p>
 
-      <p id="sunTimeRemaining" style="font-weight: 500;"></p>
+      <p id="sunEvent" style="font-size: 18px;"></p>
 
       <h3 id="currentWeather"></h3>
       <p id="temperature"></p>
@@ -72,7 +72,7 @@
       function generateWeatherSummary(temp, weatherDesc, isNight) {
         const desc = weatherDesc.toLowerCase();
         let summary = '';
-        let emojis = isNight ? ' 🌙✨' : ' ☀️';
+        let emojis = isNight ? ' 🌙✨' : ' ☀️'; // Default emojis
         
         let tempFeel = (temp < 10) ? 'freezing' : (temp < 18) ? 'chilly' : (temp < 25) ? 'pleasant' : 'warm';
 
@@ -82,7 +82,7 @@
             summary = isNight ? `Overcast and dark night with patchy clouds.` : `Mildly cloudy day with ${tempFeel} air.`;
         } else if (desc.includes('rain')) {
             summary = `A wet, ${tempFeel} day with steady rain.`;
-            emojis = ' 🌧️☔';
+            emojis = ' 🌧️☔'; 
         } else if (desc.includes('mist') || desc.includes('fog') || desc.includes('haze')) {
             summary = isNight ? `A ${tempFeel} hazy night with low visibility!` : `A ${tempFeel} hazy morning with a soft glow.`;
         } else {
@@ -92,80 +92,82 @@
         return summary + emojis;
       }
 
-      // NEW: Function to format the remaining time
-      function formatTimeRemaining(timeDiffSeconds) {
-        const totalMinutes = Math.round(timeDiffSeconds / 60);
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-        
-        let result = '';
-        if (hours > 0) {
-            result += `${hours} hour${hours > 1 ? 's' : ''}`;
-        }
-        if (minutes > 0) {
-            if (result.length > 0) result += ' and ';
-            result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
-        }
-        return result || 'less than a minute';
-      }
-
-      // Updated function to display the clock and time remaining
-      function displayLocalTime(timezoneOffsetSeconds, sunriseUTCSeconds, sunsetUTCSeconds) {
+      function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
         if (localTimeInterval) {
             clearInterval(localTimeInterval);
         }
 
         const timeElement = document.getElementById("localTime");
         const summaryElement = document.getElementById("weatherSummary");
-        const remainingElement = document.getElementById("sunTimeRemaining");
+        const sunEventElement = document.getElementById("sunEvent");
         const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
         function updateClock() {
-            const utcTime = new Date().getTime();
-            const localTimeMs = utcTime + (timezoneOffsetSeconds * 1000);
+            const now = new Date();
+            // Get current time in milliseconds adjusted for the location's offset
+            const localTimeMs = now.getTime() + now.getTimezoneOffset() * 60000 + (timezoneOffsetSeconds * 1000);
             const localDate = new Date(localTimeMs);
-            const currentSecondUTC = Math.floor(localTimeMs / 1000);
+            const currentSecondUTC = Math.floor(localTimeMs / 1000); // Current time in UTC-equivalent seconds
 
-            // 1. Determine the next event and the difference
-            let nextEventTime, eventName;
+            // Determine if it is night (current time is after sunset OR before sunrise)
+            const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
 
-            // Check if current time is after sunset OR before sunrise (i.e., it's night)
-            if (currentSecondUTC > sunsetUTCSeconds || currentSecondUTC < sunriseUTCSeconds) {
-                // If it's night, the next event is sunrise
-                eventName = "Sunrise";
-                // If past midnight, use today's (already passed) sunrise for calculation, but check for next day's sunrise
-                if (currentSecondUTC > sunsetUTCSeconds) {
-                    // It's night, but on the same day as the sunset. The next sunrise is tomorrow.
-                    // Assuming sunrise/sunset is roughly 24 hours apart (86400 seconds)
-                    nextEventTime = sunriseUTCSeconds + 86400; 
-                } else {
-                    // It's early morning before sunrise (same day)
-                    nextEventTime = sunriseUTCSeconds;
-                }
-            } else {
-                // If current time is between sunrise and sunset (i.e., it's day)
-                eventName = "Sunset";
-                nextEventTime = sunsetUTCSeconds;
-            }
-
-            const timeDiffSeconds = nextEventTime - currentSecondUTC;
-            
-            // 2. Format the time and date
+            // --- 1. Update Time Display ---
             const timeString = localDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
             const dateString = localDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // 3. Format the next event time for the display message
-            const nextEventDate = new Date(nextEventTime * 1000);
-            const nextEventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+            // --- 2. Update Sun Event Countdown ---
+            let nextEventTime, eventName, emoji;
 
-            // 4. Update the "Time Remaining" element
-            const remainingFormatted = formatTimeRemaining(timeDiffSeconds);
-            remainingElement.textContent = `${eventName} in ${remainingFormatted}: ${nextEventTimeString}`;
+            if (isNight) {
+                // If night, the next event is sunrise
+                eventName = "Sunrise";
+                emoji = "🌅";
+                // If current time is after sunset, use tomorrow's sunrise time.
+                // Since OpenWeatherMap gives today's sunrise, if current time is > today's sunset, 
+                // we should check if current time is before tomorrow's sunrise.
+                // For simplicity here, we assume if it's night, the next event is the one furthest away.
 
-            // 5. Update custom summary
-            const isNight = eventName === "Sunrise"; // Simple approximation: if the next event is sunrise, it's night.
+                // If current time is past today's sunset, the next event is tomorrow's sunrise.
+                if (currentSecondUTC > sunsetTime) {
+                    // Calculate tomorrow's sunrise time (add 24 hours in seconds)
+                    nextEventTime = sunriseTime + 86400; 
+                } else {
+                    // Current time is before today's sunset, which means it's still daytime, but the check above should have caught this.
+                    // However, if we assume the time check above is correct (isNight), then next event is tomorrow's sunrise.
+                     nextEventTime = sunriseTime + 86400; 
+                }
+
+            } else {
+                // If day, the next event is sunset
+                eventName = "Sunset";
+                emoji = "🌇";
+                nextEventTime = sunsetTime;
+            }
+
+            // Calculate the time difference in milliseconds
+            const diffMs = (nextEventTime * 1000) - localTimeMs;
+
+            // Ensure the difference is positive (meaning the event is in the future)
+            if (diffMs > 0) {
+                // Convert milliseconds to hours, minutes
+                const diffSeconds = Math.floor(diffMs / 1000);
+                const hours = Math.floor(diffSeconds / 3600);
+                const minutes = Math.floor((diffSeconds % 3600) / 60);
+
+                // Format the exact time of the event
+                const nextEventDate = new Date(nextEventTime * 1000);
+                const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+
+                sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins: ${eventTimeString}`;
+            } else {
+                // This means the event is happening now or just passed, show only the time
+                sunEventElement.textContent = `${emoji} ${eventName} at: ${eventTimeString}`;
+            }
+
+            // --- 3. Update Custom Summary ---
             if (!isNaN(temp)) {
                 summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
             }
@@ -186,23 +188,22 @@
             const weatherDesc = data.weather[0].description;
             const timezone = data.timezone; 
             
-            // Sunrise/Sunset times from OpenWeatherMap are in UTC. 
-            // We pass the raw UTC times to displayLocalTime, which will handle the local time calculation.
-            const sunriseUTC = data.sys.sunrise; 
-            const sunsetUTC = data.sys.sunset; 
+            // Sunrise/Sunset times are in UTC seconds. We need to normalize them to
+            // the local UTC-equivalent time by adding the timezone offset.
+            const sunriseTime = data.sys.sunrise + timezone; 
+            const sunsetTime = data.sys.sunset + timezone; 
 
             document.getElementById("temperature").textContent = `Temperature: ${temp}°C`;
             document.getElementById("currentWeather").textContent = weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
             
-            // Pass timezone offset and raw UTC sunrise/sunset
-            displayLocalTime(timezone, sunriseUTC, sunsetUTC);
+            displayLocalTime(timezone, sunriseTime, sunsetTime);
 
           } else {
             document.getElementById("temperature").textContent = "Weather data unavailable.";
             document.getElementById("currentWeather").textContent = "";
             document.getElementById("localTime").textContent = "--:--";
             document.getElementById("weatherSummary").textContent = "";
-            document.getElementById("sunTimeRemaining").textContent = "";
+            document.getElementById("sunEvent").textContent = "";
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
@@ -210,7 +211,7 @@
         }
       }
 
-      // --- LOCATION & AQI FETCHING (UNCHANGED) ---
+      // --- LOCATION & AQI FETCHING ---
 
       async function getLocationName(lat, lon) {
         const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
@@ -258,7 +259,7 @@
       }
 
 
-      // --- USER INPUT HANDLER (UNCHANGED) ---
+      // --- USER INPUT HANDLER ---
 
       async function getCoordinatesByCityName(cityName) {
         const encodedCity = encodeURIComponent(cityName);

@@ -23,6 +23,10 @@
 
       <p id="localTime" style="font-size: 20px;">--:--</p>
 
+      <p id="sunEvent" style="font-size: 18px;"></p>
+
+      <p id="tomorrowForecast" style="font-style: italic;"></p>
+
       <div id="sunTimes" style="font-size: 16px;">
           <p id="sunriseTime"></p>
           <p id="sunsetTime"></p>
@@ -42,7 +46,7 @@
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
       let localTimeInterval;
       
-      // --- AQI CALCULATION ---
+      // --- AQI CALCULATION (UNCHANGED) ---
 
       function pm25ToAQI(pm25) {
         const breakpoints = [
@@ -51,7 +55,7 @@
           { cLow: 35.5, cHigh: 55.4, aLow: 101, aHigh: 150 },
           { cLow: 55.5, cHigh: 150.4, aLow: 151, aHigh: 200 },
           { cLow: 150.5, cHigh: 250.4, aLow: 201, aHigh: 300 },
-          { cLow: 250.5, cHigh: 500.4, aLow: 301, aHigh: 500 },
+          { cLow: 250.5, cHigh: 500.4, aLow: 301, aAigh: 500 },
         ];
         for (let b of breakpoints) {
           if (pm25 >= b.cLow && pm25 <= b.cHigh) {
@@ -70,6 +74,72 @@
         return { text: "Hazardous", message: "Dangerous air quality! Stay indoors." };
       }
       
+      // --- FORECAST FUNCTION (NEW) ---
+
+      async function getForecast(lat, lon) {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+        const forecastElement = document.getElementById("tomorrowForecast");
+        
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          
+          if (!data.list) {
+            forecastElement.textContent = "Forecast unavailable.";
+            return;
+          }
+
+          // Determine tomorrow's date based on current local time
+          const today = new Date();
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          
+          // Format tomorrow's date as YYYY-MM-DD
+          const tomorrowDateString = tomorrow.toISOString().split('T')[0];
+          
+          let tomorrowWeather = { rain: false, wind: false, description: 'Clear' };
+
+          // Iterate through the forecast list (3-hour intervals)
+          for (let item of data.list) {
+            // Check only the items for tomorrow's date
+            if (item.dt_txt.startsWith(tomorrowDateString)) {
+                const desc = item.weather[0].description.toLowerCase();
+
+                if (desc.includes('rain') || desc.includes('shower')) {
+                    tomorrowWeather.rain = true;
+                }
+                // Check if wind speed is high (e.g., > 10 m/s or ~22 mph)
+                if (item.wind.speed > 10) {
+                    tomorrowWeather.wind = true;
+                }
+                
+                // Keep the most common or impactful description for non-rain/wind
+                if (!tomorrowWeather.rain && !tomorrowWeather.wind) {
+                    tomorrowWeather.description = desc;
+                }
+            }
+          }
+
+          // Generate summary line
+          let summaryText = '';
+          if (tomorrowWeather.rain) {
+              summaryText = '☔ Rain coming tomorrow!';
+          } else if (tomorrowWeather.wind) {
+              summaryText = '💨 Be prepared for a windy day ahead!';
+          } else if (tomorrowWeather.description.includes('clouds')) {
+              summaryText = '☁️ Expect partly cloudy skies tomorrow.';
+          } else {
+              summaryText = '☀️ Mostly sunny and clear day ahead.';
+          }
+          
+          forecastElement.textContent = summaryText;
+
+        } catch (err) {
+          forecastElement.textContent = "Forecast unavailable.";
+          console.error("Error fetching forecast data:", err);
+        }
+      }
+
       // --- TIME & WEATHER FUNCTIONS ---
 
       function generateWeatherSummary(temp, weatherDesc, isNight) {
@@ -95,7 +165,6 @@
         return summary + emojis;
       }
 
-      // --- REWRITTEN displayLocalTime FUNCTION (Simplified) ---
       function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
         if (localTimeInterval) {
             clearInterval(localTimeInterval);
@@ -103,13 +172,13 @@
 
         const timeElement = document.getElementById("localTime");
         const summaryElement = document.getElementById("weatherSummary");
+        const sunEventElement = document.getElementById("sunEvent");
         const sunriseElement = document.getElementById("sunriseTime");
         const sunsetElement = document.getElementById("sunsetTime");
-
+        
         // Get initial weather values for summary generation
         const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
-
 
         function updateClock() {
             // 1. Get the current UTC time in milliseconds.
@@ -143,13 +212,42 @@
             const dateString = localDate.toLocaleDateString('en-US', dateOptions);
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // --- 2. Update Custom Summary ---
+            // --- 2. Update Sun Event Countdown (Reintroduced) ---
+            let nextEventTime, eventName, emoji;
+
+            if (currentSecondUTC < sunsetTime) {
+                // If before sunset, the next event is sunset (today)
+                eventName = "Sunset";
+                emoji = "🌇";
+                nextEventTime = sunsetTime;
+            } else {
+                // If after sunset, the next event is sunrise (tomorrow)
+                eventName = "Sunrise";
+                emoji = "🌅";
+                nextEventTime = sunriseTime + 86400; // Add 24 hours (86400 seconds)
+            }
+
+            // Calculate the time difference (in milliseconds)
+            const diffMs = (nextEventTime * 1000) - localTimeMs;
+
+            if (diffMs > 0) {
+                const diffSeconds = Math.floor(diffMs / 1000);
+                const hours = Math.floor(diffSeconds / 3600);
+                const minutes = Math.floor((diffSeconds % 3600) / 60);
+
+                const nextEventDate = new Date(nextEventTime * 1000);
+                const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+
+                sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins: ${eventTimeString}`;
+            } else {
+                 sunEventElement.textContent = ''; // Hide if calculation is negative (i.e., just passed)
+            }
+
+
+            // --- 3. Update Custom Summary ---
             if (!isNaN(temp)) {
                 summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
             }
-            
-            // NOTE: The static sunrise/sunset display is handled outside this loop (in displayLocalTime) 
-            // because those values do not change every second.
         }
         
         // --- STATIC SUN TIME DISPLAY (Executed once on data load) ---
@@ -180,8 +278,6 @@
             const weatherDesc = data.weather[0].description;
             const timezone = data.timezone; 
             
-            // Sunrise/Sunset times are UTC seconds. We add the timezone offset to get the 
-            // UTC-equivalent time in the local timezone (Crucial for display).
             const sunriseTime = data.sys.sunrise + timezone; 
             const sunsetTime = data.sys.sunset + timezone; 
 
@@ -197,6 +293,7 @@
             document.getElementById("weatherSummary").textContent = "";
             document.getElementById("sunriseTime").textContent = "";
             document.getElementById("sunsetTime").textContent = "";
+            document.getElementById("sunEvent").textContent = "";
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
@@ -205,7 +302,7 @@
         }
       }
 
-      // --- LOCATION & AQI FETCHING (UNCHANGED) ---
+      // --- LOCATION & AQI FETCHING ---
 
       async function getLocationName(lat, lon) {
         const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
@@ -250,10 +347,11 @@
         getAirQuality(lat, lon);
         getLocationName(lat, lon);
         getWeather(lat, lon);
+        getForecast(lat, lon); // NEW: Fetch forecast data
       }
 
 
-      // --- USER INPUT HANDLER (UNCHANGED) ---
+      // --- USER INPUT HANDLER ---
 
       async function getCoordinatesByCityName(cityName) {
         const encodedCity = encodeURIComponent(cityName);

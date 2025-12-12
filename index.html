@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>weatherApp ~ V2.0</title>
+    <meta charset="UFT-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--https://cdn-icons-png.flaticon.com/512/19015/19015169.png-->
+    <link rel="icon" type="image/png" sizes="32x32" href="/weatherApp/files/icon.png" />
+    <link rel="stylesheet" href="design.css" />
+    <!-- <script src="main.js"></script> -->
+  </head>
+  <body>
+    <center>
+      <div class="uD">
+        <h3 class="heading">Weather App (v3.0)</h3>
+        <input type="text" id="cityIp" placeholder="Type a city..." />
+        <br /><br />
+        <button type="button" id="getWeatherBtn">Check</button>
+        <br /><br />
+        <img
+          id="myImageUp"
+          class="hidden"
+          src="/weatherApp/files/loading.gif"
+          style="width: 35px"
+        />
+        <p id="result">Enter a City and Check weather !</p>
+      </div>
+      <div class="lD">
+        <br />
+        <img
+          id="myImage"
+          class="hidden"
+          src="/weatherApp/files/loading.gif"
+          style="width: 35px"
+        />
+        <p id="auto_city"></p>
+      </div>
+      <script src="main.js"></script>
+    </center>
+  </body>
+</html>

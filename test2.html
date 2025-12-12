@@ -4,8 +4,84 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Air Quality & Weather</title>
+    <style>
+      /* --- Base Styles --- */
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        /* Default background - applied before JS runs */
+        background: linear-gradient(135deg, #f0f8ff, #e0ffff);
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        transition: background 3s ease-in-out, background-size 3s ease-in-out;
+      }
+      
+      /* Container for visual clarity on dynamic background */
+      div {
+          max-width: 600px;
+          margin: 0 auto;
+          background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background for content */
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* --- Animated Background Classes --- */
+
+      /* Helper for animation */
+      @keyframes gradientAnimation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      /* Clear Day: Bright blue to light gold */
+      .clear-day-bg {
+          background: linear-gradient(45deg, #87ceeb, #ffd700, #4682b4);
+          background-size: 300% 300%;
+          animation: gradientAnimation 20s ease infinite;
+      }
+
+      /* Clear Night: Dark blue/purple with stars effect */
+      .clear-night-bg {
+          background: linear-gradient(135deg, #000033, #191970, #4b0082);
+          background-size: 300% 300%;
+          animation: gradientAnimation 30s ease infinite;
+          color: #f0f8ff; /* Lighten text for contrast */
+      }
+      .clear-night-bg div {
+          background: rgba(0, 0, 0, 0.7);
+      }
+
+      /* Cloudy Day: Grey/white to pale blue */
+      .cloudy-day-bg {
+          background: linear-gradient(160deg, #b0c4de, #f5f5f5, #a9a9a9);
+          background-size: 200% 200%;
+          animation: gradientAnimation 40s linear infinite;
+      }
+
+      /* Cloudy Night: Dark grey/indigo */
+      .cloudy-night-bg {
+          background: linear-gradient(135deg, #36454F, #1C2833);
+          background-size: 150% 150%;
+          animation: gradientAnimation 50s ease infinite;
+          color: #ccc;
+      }
+      .cloudy-night-bg div {
+          background: rgba(0, 0, 0, 0.7);
+      }
+      
+      /* Rain/Mist/Haze: Muted blue-grey */
+      .rain-mist-bg {
+          background: linear-gradient(180deg, #708090, #c0c0c0, #696969);
+          background-size: 200% 200%;
+          animation: gradientAnimation 35s ease infinite reverse;
+      }
+
+    </style>
   </head>
-  <body>
+  <body id="body">
     <h1>Air Quality Index (AQI)</h1>
 
     <div>
@@ -49,6 +125,30 @@
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
       let localTimeInterval;
       
+      // --- BACKGROUND ANIMATION LOGIC (NEW) ---
+      function setBackground(weatherDesc, isNight) {
+          const body = document.getElementById('body');
+          const currentClass = body.className;
+          let newClass = '';
+          
+          const desc = weatherDesc.toLowerCase();
+
+          if (desc.includes('clear') || desc.includes('sun')) {
+              newClass = isNight ? 'clear-night-bg' : 'clear-day-bg';
+          } else if (desc.includes('rain') || desc.includes('mist') || desc.includes('fog') || desc.includes('haze')) {
+              newClass = 'rain-mist-bg';
+          } else if (desc.includes('cloud')) {
+              newClass = isNight ? 'cloudy-night-bg' : 'cloudy-day-bg';
+          } else {
+              // Default fallback
+              newClass = isNight ? 'cloudy-night-bg' : 'cloudy-day-bg';
+          }
+          
+          if (currentClass !== newClass) {
+              body.className = newClass;
+          }
+      }
+
       // --- AQI CALCULATION (UNCHANGED) ---
 
       function pm25ToAQI(pm25) {
@@ -136,13 +236,11 @@
         }
       }
 
-      // --- MAP FUNCTION (NEW) ---
+      // --- MAP FUNCTION (UNCHANGED) ---
 
       function displayMap(lat, lon) {
           const mapContainer = document.getElementById("mapContainer");
           
-          // Using a common format for embedding a Google Map with lat/lon and a zoom level (z=12 for city view)
-          // Note: API keys are generally required for production, but this non-API URL often works for basic embedding.
           const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed`; 
           
           mapContainer.innerHTML = `
@@ -153,13 +251,13 @@
                   scrolling="no" 
                   marginheight="0" 
                   marginwidth="0" 
-                  src="${mapUrl}"
+                  src="https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed"
                   allowfullscreen>
               </iframe>
-          `; //
+          `;
       }
       
-      // --- TIME & WEATHER FUNCTIONS (UNCHANGED) ---
+      // --- TIME & WEATHER FUNCTIONS ---
 
       function generateWeatherSummary(temp, weatherDesc, isNight) {
         const desc = weatherDesc.toLowerCase();
@@ -195,7 +293,7 @@
         const sunriseElement = document.getElementById("sunriseTime");
         const sunsetElement = document.getElementById("sunsetTime");
         
-        const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
+        const weatherDesc = document.getElementById("currentWeather").textContent;
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
         function updateClock() {
@@ -204,7 +302,12 @@
             const localDate = new Date(localTimeMs);
             const currentSecondUTC = Math.floor(localTimeMs / 1000); 
 
+            // Determine if it is night 
             const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
+            
+            // NEW: Set background animation
+            setBackground(weatherDesc, isNight);
+
 
             // --- 1. Update Time Display ---
             const timeOptions = { 
@@ -239,7 +342,7 @@
             } else {
                 eventName = "Sunrise";
                 emoji = "🌅";
-                nextEventTime = sunriseTime + 86400; // Tomorrow's sunrise
+                nextEventTime = sunriseTime + 86400; 
             }
 
             const diffMs = (nextEventTime * 1000) - localTimeMs;
@@ -257,7 +360,7 @@
 
             // --- 3. Update Custom Summary ---
             if (!isNaN(temp)) {
-                summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
+                summaryElement.textContent = generateWeatherSummary(temp, weatherDesc.toLowerCase(), isNight);
             }
         }
         
@@ -370,7 +473,7 @@
         getLocationName(lat, lon);
         getWeather(lat, lon);
         getForecast(lat, lon); 
-        displayMap(lat, lon); // NEW: Display the map for the location
+        displayMap(lat, lon); 
       }
 
 
@@ -427,5 +530,3 @@
     </script>
   </body>
 </html>
-
-

@@ -72,7 +72,7 @@
       function generateWeatherSummary(temp, weatherDesc, isNight) {
         const desc = weatherDesc.toLowerCase();
         let summary = '';
-        let emojis = isNight ? ' 🌙✨' : ' ☀️'; // Default emojis
+        let emojis = isNight ? ' 🌙✨' : ' ☀️'; 
         
         let tempFeel = (temp < 10) ? 'freezing' : (temp < 18) ? 'chilly' : (temp < 25) ? 'pleasant' : 'warm';
 
@@ -105,10 +105,15 @@
 
         function updateClock() {
             const now = new Date();
-            // Get current time in milliseconds adjusted for the location's offset
-            const localTimeMs = now.getTime() + now.getTimezoneOffset() * 60000 + (timezoneOffsetSeconds * 1000);
+            
+            // 1. Get current time in milliseconds (UTC)
+            const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000); 
+            
+            // 2. Apply the remote location's offset to get the remote local time
+            const localTimeMs = utcMs + (timezoneOffsetSeconds * 1000);
+            
             const localDate = new Date(localTimeMs);
-            const currentSecondUTC = Math.floor(localTimeMs / 1000); // Current time in UTC-equivalent seconds
+            const currentSecondUTC = Math.floor(localTimeMs / 1000); 
 
             // Determine if it is night (current time is after sunset OR before sunrise)
             const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
@@ -118,53 +123,39 @@
             const dateString = localDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // --- 2. Update Sun Event Countdown ---
+            // --- 2. Update Sun Event Countdown (FIXED LOGIC) ---
             let nextEventTime, eventName, emoji;
 
-            if (isNight) {
-                // If night, the next event is sunrise
-                eventName = "Sunrise";
-                emoji = "🌅";
-                // If current time is after sunset, use tomorrow's sunrise time.
-                // Since OpenWeatherMap gives today's sunrise, if current time is > today's sunset, 
-                // we should check if current time is before tomorrow's sunrise.
-                // For simplicity here, we assume if it's night, the next event is the one furthest away.
-
-                // If current time is past today's sunset, the next event is tomorrow's sunrise.
-                if (currentSecondUTC > sunsetTime) {
-                    // Calculate tomorrow's sunrise time (add 24 hours in seconds)
-                    nextEventTime = sunriseTime + 86400; 
-                } else {
-                    // Current time is before today's sunset, which means it's still daytime, but the check above should have caught this.
-                    // However, if we assume the time check above is correct (isNight), then next event is tomorrow's sunrise.
-                     nextEventTime = sunriseTime + 86400; 
-                }
-
-            } else {
-                // If day, the next event is sunset
+            // Check if current time is before TODAY's sunset
+            if (currentSecondUTC < sunsetTime) {
+                // If before sunset, the next event is sunset
                 eventName = "Sunset";
                 emoji = "🌇";
                 nextEventTime = sunsetTime;
+            } else {
+                // If after sunset, the next event is TOMORROW's sunrise
+                eventName = "Sunrise";
+                emoji = "🌅";
+                // Add 24 hours (86400 seconds) to today's sunrise time
+                nextEventTime = sunriseTime + 86400; 
             }
 
             // Calculate the time difference in milliseconds
             const diffMs = (nextEventTime * 1000) - localTimeMs;
 
-            // Ensure the difference is positive (meaning the event is in the future)
             if (diffMs > 0) {
-                // Convert milliseconds to hours, minutes
                 const diffSeconds = Math.floor(diffMs / 1000);
                 const hours = Math.floor(diffSeconds / 3600);
                 const minutes = Math.floor((diffSeconds % 3600) / 60);
 
-                // Format the exact time of the event
                 const nextEventDate = new Date(nextEventTime * 1000);
                 const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
 
                 sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins: ${eventTimeString}`;
             } else {
-                // This means the event is happening now or just passed, show only the time
-                sunEventElement.textContent = `${emoji} ${eventName} at: ${eventTimeString}`;
+                 const nextEventDate = new Date(nextEventTime * 1000);
+                 const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+                sunEventElement.textContent = `${emoji} ${eventName} is happening now at ${eventTimeString}!`;
             }
 
             // --- 3. Update Custom Summary ---
@@ -188,8 +179,8 @@
             const weatherDesc = data.weather[0].description;
             const timezone = data.timezone; 
             
-            // Sunrise/Sunset times are in UTC seconds. We need to normalize them to
-            // the local UTC-equivalent time by adding the timezone offset.
+            // Sunrise/Sunset times are UTC seconds. We add the timezone offset to get the 
+            // UTC-equivalent time in the local timezone (Crucial for comparison).
             const sunriseTime = data.sys.sunrise + timezone; 
             const sunsetTime = data.sys.sunset + timezone; 
 

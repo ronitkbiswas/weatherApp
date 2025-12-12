@@ -172,3 +172,131 @@ if (navigator.geolocation) {
 } else {
   console.log("Geolocation not supported.");
 }
+
+//popular locations starts /////////////////// KOLKATA
+async function fetchKolkataWeather() {
+  const pop = document.getElementById("pop");
+  const city = "Kolkata";
+  const apiKey = "b782ee4ad515b759b84bb4c98d77b48e"; // add your key here
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+    city
+  )}&appid=${apiKey}&units=metric`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      pop.textContent = "Not found! Try another city...";
+      return;
+    }
+    const data = await res.json();
+    const temp = data.main.temp;
+    pop.innerHTML = `
+      <span style='font-size:18px;color:black;font-weight:600;'>⛅ Popular Location</span>
+      <br><br>
+      <span style='font-size:16px'>🏙️ ${city}</span> : <span style='font-size:18px;'><b>${temp.toFixed(
+      0
+    )}°C</b></span>
+    `;
+  } catch (err) {
+    console.error(err);
+    pop.textContent = "Something went wrong! ERROR 404";
+  }
+}
+
+// call the function
+fetchKolkataWeather();
+
+// popular locations ends ///////////////////
+// sikkim //
+async function fetchSikkimWeather() {
+  const pop2 = document.getElementById("pop2");
+  const city = "Sikkim";
+  const apiKey = "b782ee4ad515b759b84bb4c98d77b48e"; // add your key here
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+    city
+  )}&appid=${apiKey}&units=metric`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      pop2.textContent = "Not found! Try another city...";
+      return;
+    }
+    const data = await res.json();
+    const temp = data.main.temp;
+    pop2.innerHTML = `
+      
+      <span style='font-size:16px'>❄️ ${city}</span> : <span style='font-size:18px;'><b>${temp.toFixed(
+      0
+    )}°C</b></span>
+    `;
+  } catch (err) {
+    console.error(err);
+    pop2.textContent = "Something went wrong! ERROR 404";
+  }
+}
+
+// call the function
+fetchSikkimWeather();
+//sikkim ///
+//ranaghat
+async function fetchRanaghatWeather() {
+  const pop3 = document.getElementById("pop3");
+  const city = "Ranaghat";
+  const apiKey = "b782ee4ad515b759b84bb4c98d77b48e"; // add your key here
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+    city
+  )}&appid=${apiKey}&units=metric`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      pop3.textContent = "Not found! Try another city...";
+      return;
+    }
+    const data = await res.json();
+    const temp = data.main.temp;
+    pop3.innerHTML = `
+      
+      <span style='font-size:16px'>🌨️ ${city}</span> : <span style='font-size:18px;'><b>${temp.toFixed(
+      0
+    )}°C</b></span>
+    `;
+  } catch (err) {
+    console.error(err);
+    pop3.textContent = "Something went wrong! ERROR 404";
+  }
+}
+
+// call the function
+fetchRanaghatWeather();
+//Darjeeling ///
+async function fetchDarjeelingWeather() {
+  const pop4 = document.getElementById("pop4");
+  const city = "Darjeeling";
+  const apiKey = "b782ee4ad515b759b84bb4c98d77b48e"; // add your key here
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+    city
+  )}&appid=${apiKey}&units=metric`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      pop4.textContent = "Not found! Try another city...";
+      return;
+    }
+    const data = await res.json();
+    const temp = data.main.temp;
+    pop4.innerHTML = `
+      
+      <span style='font-size:16px'>❄️ ${city}</span> :
+      <span style='font-size:18px;'><b>${temp.toFixed(0)}°C</b></span>
+    `;
+  } catch (err) {
+    console.error(err);
+    pop4.textContent = "Something went wrong! ERROR 404";
+  }
+}
+
+// call the function
+fetchDarjeelingWeather();

@@ -7,9 +7,16 @@
   </head>
   <body>
     <h1>Air Quality Index (AQI)</h1>
+
+    <div>
+      <input type="text" id="cityInput" placeholder="Enter City or Location Name" />
+      <button onclick="searchLocation()">Search AQI</button>
+    </div>
+    <br>
     
     <div>
       <p id="status">Detecting location...</p>
+      <h2 id="locationName"></h2>
       <h2 id="aqiValue"></h2>
       <p id="meaning"></p>
       <p id="desc"></p>
@@ -18,7 +25,7 @@
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
 
-      // Convert PM2.5 to AQI
+      // Convert PM2.5 to AQI (US EPA Standard)
       function pm25ToAQI(pm25) {
         const breakpoints = [
           { cLow: 0, cHigh: 12, aLow: 0, aHigh: 50 },
@@ -39,40 +46,38 @@
         return 500;
       }
 
-      // Define meaning + health message (Colors removed)
       function getAqiMeaning(aqi) {
-        if (aqi <= 50)
-          return {
-            text: "Good",
-            message: "Air quality is excellent. Great time for outdoor activities!",
-          };
-        if (aqi <= 100)
-          return {
-            text: "Moderate",
-            message: "Air quality is acceptable. Sensitive people should take it easy outdoors.",
-          };
-        if (aqi <= 150)
-          return {
-            text: "Unhealthy for Sensitive",
-            message: "Those with asthma or allergies should limit outdoor exposure.",
-          };
-        if (aqi <= 200)
-          return {
-            text: "Unhealthy",
-            message: "Air quality is poor. Avoid prolonged outdoor activity.",
-          };
-        if (aqi <= 300)
-          return {
-            text: "Very Unhealthy",
-            message: "Everyone may experience health effects. Stay indoors with filtered air.",
-          };
-        return {
-          text: "Hazardous",
-          message:
-            "Dangerous air quality! Stay indoors, close windows, and use an air purifier if possible.",
-        };
+        if (aqi <= 50) return { text: "Good", message: "Air quality is excellent. Great time for outdoor activities!" };
+        if (aqi <= 100) return { text: "Moderate", message: "Air quality is acceptable. Sensitive people should take it easy outdoors." };
+        if (aqi <= 150) return { text: "Unhealthy for Sensitive", message: "Those with asthma or allergies should limit outdoor exposure." };
+        if (aqi <= 200) return { text: "Unhealthy", message: "Air quality is poor. Avoid prolonged outdoor activity." };
+        if (aqi <= 300) return { text: "Very Unhealthy", message: "Everyone may experience health effects. Stay indoors with filtered air." };
+        return { text: "Hazardous", message: "Dangerous air quality! Stay indoors." };
       }
 
+      // Reusable function to get Location Name from Coordinates (Reverse Geocoding)
+      async function getLocationName(lat, lon) {
+        const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data.length > 0) {
+            const location = data[0];
+            // Show the name and country (or state if available)
+            const display = location.state ? `${location.name}, ${location.state}, ${location.country}` : `${location.name}, ${location.country}`;
+            document.getElementById("locationName").textContent = display;
+            return display;
+          } else {
+            document.getElementById("locationName").textContent = "Unknown Location";
+            return "Unknown Location";
+          }
+        } catch (err) {
+          console.error("Error fetching location name:", err);
+          return "Error fetching location name";
+        }
+      }
+
+      // Reusable function to get Air Quality for given coordinates
       async function getAirQuality(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
         try {
@@ -82,35 +87,81 @@
           const aqi = pm25ToAQI(pm25);
           const info = getAqiMeaning(aqi);
 
-          // Removed style updates
-          document.getElementById("status").textContent = `Air Quality: ${aqi} – ${info.text}`;
-          document.getElementById("aqiValue").textContent = `${aqi}`;
+          document.getElementById("status").textContent = "Data Loaded";
+          document.getElementById("aqiValue").textContent = `AQI: ${aqi}`;
           document.getElementById("meaning").textContent = info.text;
           document.getElementById("desc").textContent = info.message;
         } catch (err) {
-          document.getElementById("status").textContent = "Error fetching data.";
+          document.getElementById("status").textContent = "Error fetching AQI data. (Check API Key/Quota)";
           console.error(err);
         }
       }
 
+      // NEW: Function to get coordinates from a City Name (Direct Geocoding)
+      async function getCoordinatesByCityName(cityName) {
+        const encodedCity = encodeURIComponent(cityName);
+        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedCity}&limit=1&appid=${apiKey}`;
+        try {
+          document.getElementById("status").textContent = `Searching for "${cityName}"...`;
+          const res = await fetch(url);
+          const data = await res.json();
+          
+          if (data.length > 0) {
+            const { lat, lon } = data[0];
+            
+            // Update UI with the new location and AQI
+            getAirQuality(lat, lon);
+            
+            // Use the name returned by the geocoding API for immediate display
+            const display = data[0].state ? `${data[0].name}, ${data[0].state}, ${data[0].country}` : `${data[0].name}, ${data[0].country}`;
+            document.getElementById("locationName").textContent = display;
+
+          } else {
+            document.getElementById("status").textContent = `Location "${cityName}" not found.`;
+            document.getElementById("locationName").textContent = "";
+            document.getElementById("aqiValue").textContent = "";
+            document.getElementById("meaning").textContent = "";
+            document.getElementById("desc").textContent = "";
+          }
+        } catch (err) {
+          document.getElementById("status").textContent = "Error during city search.";
+          console.error(err);
+        }
+      }
+
+      // Function triggered by the search button
+      function searchLocation() {
+        const cityName = document.getElementById("cityInput").value.trim();
+        if (cityName) {
+          getCoordinatesByCityName(cityName);
+        } else {
+          document.getElementById("status").textContent = "Please enter a location name.";
+        }
+      }
+
+      // Original function to get location on page load (Auto-Location)
       function getLocation() {
         if (!navigator.geolocation) {
-          document.getElementById("status").textContent = "Geolocation not supported.";
+          document.getElementById("status").textContent = "Geolocation not supported. Please use the search bar.";
           return;
         }
 
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
-            document.getElementById("status").textContent = "Fetching air quality...";
+            document.getElementById("status").textContent = "Fetching your current location data...";
+            
+            // Get both AQI and Location Name for the auto-detected location
             getAirQuality(latitude, longitude);
+            getLocationName(latitude, longitude);
           },
           () => {
-            document.getElementById("status").textContent = "Failed to get location.";
+            document.getElementById("status").textContent = "Failed to get location. Please use the search bar.";
           }
         );
       }
 
+      // Initialize on load
       getLocation();
     </script>
   </body>

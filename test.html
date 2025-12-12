@@ -19,34 +19,41 @@
         padding: 30px;
         display: inline-block;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        min-width: 280px;
+        min-width: 300px;
+        transition: background 0.5s;
       }
       h1 {
-        font-size: 26px;
-        margin-bottom: 10px;
+        font-size: 28px;
+        margin-bottom: 15px;
       }
       h2 {
-        font-size: 22px;
-        margin-top: 5px;
+        font-size: 40px;
+        margin: 10px 0;
       }
       p {
         font-size: 18px;
         margin: 8px 0;
       }
+      .desc {
+        font-size: 16px;
+        line-height: 1.5;
+        opacity: 0.9;
+      }
     </style>
   </head>
   <body>
-    <h1>🌤️ Air Quality</h1>
+    <h1>🌤️ Air Quality Index (AQI)</h1>
     <div class="card">
       <p id="status">Detecting location...</p>
       <h2 id="aqiValue"></h2>
       <p id="meaning"></p>
+      <p id="desc" class="desc"></p>
     </div>
 
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
 
-      // Convert PM2.5 to AQI (based on US EPA scale)
+      // Convert PM2.5 to AQI
       function pm25ToAQI(pm25) {
         const breakpoints = [
           { cLow: 0, cHigh: 12, aLow: 0, aHigh: 50 },
@@ -67,13 +74,44 @@
         return 500;
       }
 
+      // Define meaning + health message + color
       function getAqiMeaning(aqi) {
-        if (aqi <= 50) return { text: "Good", color: "#4CAF50" };
-        if (aqi <= 100) return { text: "Moderate", color: "#CDDC39" };
-        if (aqi <= 150) return { text: "Unhealthy for Sensitive", color: "#FFC107" };
-        if (aqi <= 200) return { text: "Unhealthy", color: "#FF5722" };
-        if (aqi <= 300) return { text: "Very Unhealthy", color: "#9C27B0" };
-        return { text: "Hazardous", color: "#B71C1C" };
+        if (aqi <= 50)
+          return {
+            text: "Good",
+            color: "#4CAF50",
+            message: "Air quality is excellent. Great time for outdoor activities!",
+          };
+        if (aqi <= 100)
+          return {
+            text: "Moderate",
+            color: "#CDDC39",
+            message: "Air quality is acceptable. Sensitive people should take it easy outdoors.",
+          };
+        if (aqi <= 150)
+          return {
+            text: "Unhealthy for Sensitive",
+            color: "#FFC107",
+            message: "Those with asthma or allergies should limit outdoor exposure.",
+          };
+        if (aqi <= 200)
+          return {
+            text: "Unhealthy",
+            color: "#FF7043",
+            message: "Air quality is poor. Avoid prolonged outdoor activity.",
+          };
+        if (aqi <= 300)
+          return {
+            text: "Very Unhealthy",
+            color: "#AB47BC",
+            message: "Everyone may experience health effects. Stay indoors with filtered air.",
+          };
+        return {
+          text: "Hazardous",
+          color: "#B71C1C",
+          message:
+            "Dangerous air quality! Stay indoors, close windows, and use an air purifier if possible.",
+        };
       }
 
       async function getAirQuality(lat, lon) {
@@ -89,6 +127,7 @@
           document.getElementById("status").textContent = `Air Quality: ${aqi} – ${info.text}`;
           document.getElementById("aqiValue").textContent = `${aqi}`;
           document.getElementById("meaning").textContent = info.text;
+          document.getElementById("desc").textContent = info.message;
         } catch (err) {
           document.getElementById("status").textContent = "Error fetching data.";
           console.error(err);

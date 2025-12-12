@@ -54,7 +54,7 @@
           { cLow: 12.1, cHigh: 35.4, aLow: 51, aHigh: 100 },
           { cLow: 35.5, cHigh: 55.4, aLow: 101, aHigh: 150 },
           { cLow: 55.5, cHigh: 150.4, aLow: 151, aHigh: 200 },
-          { cLow: 150.5, cHigh: 250.4, aLow: 201, aHigh: 300 },
+          { cLow: 150.5, cHigh: 250.4, aLow: 201, aAigh: 300 },
           { cLow: 250.5, cHigh: 500.4, aLow: 301, aAigh: 500 },
         ];
         for (let b of breakpoints) {
@@ -74,7 +74,7 @@
         return { text: "Hazardous", message: "Dangerous air quality! Stay indoors." };
       }
       
-      // --- FORECAST FUNCTION (NEW) ---
+      // --- FORECAST FUNCTION (UNCHANGED) ---
 
       async function getForecast(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
@@ -89,38 +89,31 @@
             return;
           }
 
-          // Determine tomorrow's date based on current local time
           const today = new Date();
           const tomorrow = new Date(today);
           tomorrow.setDate(tomorrow.getDate() + 1);
           
-          // Format tomorrow's date as YYYY-MM-DD
           const tomorrowDateString = tomorrow.toISOString().split('T')[0];
           
           let tomorrowWeather = { rain: false, wind: false, description: 'Clear' };
 
-          // Iterate through the forecast list (3-hour intervals)
           for (let item of data.list) {
-            // Check only the items for tomorrow's date
             if (item.dt_txt.startsWith(tomorrowDateString)) {
                 const desc = item.weather[0].description.toLowerCase();
 
                 if (desc.includes('rain') || desc.includes('shower')) {
                     tomorrowWeather.rain = true;
                 }
-                // Check if wind speed is high (e.g., > 10 m/s or ~22 mph)
                 if (item.wind.speed > 10) {
                     tomorrowWeather.wind = true;
                 }
                 
-                // Keep the most common or impactful description for non-rain/wind
                 if (!tomorrowWeather.rain && !tomorrowWeather.wind) {
                     tomorrowWeather.description = desc;
                 }
             }
           }
 
-          // Generate summary line
           let summaryText = '';
           if (tomorrowWeather.rain) {
               summaryText = '☔ Rain coming tomorrow!';
@@ -176,7 +169,6 @@
         const sunriseElement = document.getElementById("sunriseTime");
         const sunsetElement = document.getElementById("sunsetTime");
         
-        // Get initial weather values for summary generation
         const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
@@ -212,19 +204,17 @@
             const dateString = localDate.toLocaleDateString('en-US', dateOptions);
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // --- 2. Update Sun Event Countdown (Reintroduced) ---
+            // --- 2. Update Sun Event Countdown (Simplified) ---
             let nextEventTime, eventName, emoji;
 
             if (currentSecondUTC < sunsetTime) {
-                // If before sunset, the next event is sunset (today)
                 eventName = "Sunset";
                 emoji = "🌇";
                 nextEventTime = sunsetTime;
             } else {
-                // If after sunset, the next event is sunrise (tomorrow)
                 eventName = "Sunrise";
                 emoji = "🌅";
-                nextEventTime = sunriseTime + 86400; // Add 24 hours (86400 seconds)
+                nextEventTime = sunriseTime + 86400; // Tomorrow's sunrise
             }
 
             // Calculate the time difference (in milliseconds)
@@ -235,10 +225,8 @@
                 const hours = Math.floor(diffSeconds / 3600);
                 const minutes = Math.floor((diffSeconds % 3600) / 60);
 
-                const nextEventDate = new Date(nextEventTime * 1000);
-                const eventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
-
-                sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins: ${eventTimeString}`;
+                // SIMPLIFIED LINE: Only countdown and event name
+                sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins`;
             } else {
                  sunEventElement.textContent = ''; // Hide if calculation is negative (i.e., just passed)
             }
@@ -250,7 +238,7 @@
             }
         }
         
-        // --- STATIC SUN TIME DISPLAY (Executed once on data load) ---
+        // --- STATIC SUN TIME DISPLAY ---
         const sunriseDate = new Date(sunriseTime * 1000);
         const sunsetDate = new Date(sunsetTime * 1000);
         
@@ -302,7 +290,7 @@
         }
       }
 
-      // --- LOCATION & AQI FETCHING ---
+      // --- LOCATION & AQI FETCHING (UNCHANGED) ---
 
       async function getLocationName(lat, lon) {
         const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
@@ -347,11 +335,11 @@
         getAirQuality(lat, lon);
         getLocationName(lat, lon);
         getWeather(lat, lon);
-        getForecast(lat, lon); // NEW: Fetch forecast data
+        getForecast(lat, lon); // Fetch forecast data
       }
 
 
-      // --- USER INPUT HANDLER ---
+      // --- USER INPUT HANDLER (UNCHANGED) ---
 
       async function getCoordinatesByCityName(cityName) {
         const encodedCity = encodeURIComponent(cityName);

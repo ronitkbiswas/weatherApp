@@ -8,7 +8,7 @@
       body {
         font-family: "Poppins", sans-serif;
         text-align: center;
-        background: linear-gradient(to right, #74ebd5, #acb6e5);
+        background: linear-gradient(to right, #2980b9, #6dd5fa);
         color: white;
         margin: 0;
         padding: 50px;
@@ -19,7 +19,7 @@
         padding: 30px;
         display: inline-block;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        min-width: 250px;
+        min-width: 280px;
       }
       h1 {
         font-size: 26px;
@@ -39,33 +39,56 @@
     <h1>🌤️ Air Quality</h1>
     <div class="card">
       <p id="status">Detecting location...</p>
-      <h2 id="aqiText"></h2>
+      <h2 id="aqiValue"></h2>
       <p id="meaning"></p>
     </div>
 
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
 
-      const aqiLevels = {
-        1: { label: "Good", desc: "Air quality is good. Enjoy your day!", color: "#4CAF50" },
-        2: { label: "Fair", desc: "Air quality is acceptable.", color: "#CDDC39" },
-        3: { label: "Moderate", desc: "Sensitive people should limit outdoor activity.", color: "#FFC107" },
-        4: { label: "Poor", desc: "Unhealthy air for everyone. Try to stay indoors.", color: "#FF5722" },
-        5: { label: "Very Poor", desc: "Hazardous! Avoid going outside.", color: "#D32F2F" },
-      };
+      // Convert PM2.5 to AQI (based on US EPA scale)
+      function pm25ToAQI(pm25) {
+        const breakpoints = [
+          { cLow: 0, cHigh: 12, aLow: 0, aHigh: 50 },
+          { cLow: 12.1, cHigh: 35.4, aLow: 51, aHigh: 100 },
+          { cLow: 35.5, cHigh: 55.4, aLow: 101, aHigh: 150 },
+          { cLow: 55.5, cHigh: 150.4, aLow: 151, aHigh: 200 },
+          { cLow: 150.5, cHigh: 250.4, aLow: 201, aHigh: 300 },
+          { cLow: 250.5, cHigh: 500.4, aLow: 301, aHigh: 500 },
+        ];
 
-      async function getAirPollution(lat, lon) {
+        for (let b of breakpoints) {
+          if (pm25 >= b.cLow && pm25 <= b.cHigh) {
+            return Math.round(
+              ((b.aHigh - b.aLow) / (b.cHigh - b.cLow)) * (pm25 - b.cLow) + b.aLow
+            );
+          }
+        }
+        return 500;
+      }
+
+      function getAqiMeaning(aqi) {
+        if (aqi <= 50) return { text: "Good", color: "#4CAF50" };
+        if (aqi <= 100) return { text: "Moderate", color: "#CDDC39" };
+        if (aqi <= 150) return { text: "Unhealthy for Sensitive", color: "#FFC107" };
+        if (aqi <= 200) return { text: "Unhealthy", color: "#FF5722" };
+        if (aqi <= 300) return { text: "Very Unhealthy", color: "#9C27B0" };
+        return { text: "Hazardous", color: "#B71C1C" };
+      }
+
+      async function getAirQuality(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
         try {
           const res = await fetch(url);
           const data = await res.json();
-          const aqi = data.list[0].main.aqi;
+          const pm25 = data.list[0].components.pm2_5;
+          const aqi = pm25ToAQI(pm25);
+          const info = getAqiMeaning(aqi);
 
-          const info = aqiLevels[aqi];
           document.querySelector(".card").style.background = info.color;
-          document.getElementById("status").textContent = `Air Quality Index: ${aqi}`;
-          document.getElementById("aqiText").textContent = `${info.label}`;
-          document.getElementById("meaning").textContent = info.desc;
+          document.getElementById("status").textContent = `Air Quality: ${aqi} – ${info.text}`;
+          document.getElementById("aqiValue").textContent = `${aqi}`;
+          document.getElementById("meaning").textContent = info.text;
         } catch (err) {
           document.getElementById("status").textContent = "Error fetching data.";
           console.error(err);
@@ -77,11 +100,12 @@
           document.getElementById("status").textContent = "Geolocation not supported.";
           return;
         }
+
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
             document.getElementById("status").textContent = "Fetching air quality...";
-            getAirPollution(latitude, longitude);
+            getAirQuality(latitude, longitude);
           },
           () => {
             document.getElementById("status").textContent = "Failed to get location.";

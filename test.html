@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Air Quality</title>
+    <title>Air Quality & Weather</title>
   </head>
   <body>
     <h1>Air Quality Index (AQI)</h1>
@@ -16,7 +16,16 @@
     
     <div>
       <p id="status">Detecting location...</p>
+      
       <h2 id="locationName"></h2>
+      
+      <p id="localTime" style="font-size: 20px;">--:--</p>
+
+      <h3 id="currentWeather"></h3>
+      <p id="temperature"></p>
+      
+      <hr>
+
       <h2 id="aqiValue"></h2>
       <p id="meaning"></p>
       <p id="desc"></p>
@@ -24,6 +33,9 @@
 
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
+      let localTimeInterval; // Variable to store the interval for the clock
+
+      // --- AQI CALCULATION ---
 
       // Convert PM2.5 to AQI (US EPA Standard)
       function pm25ToAQI(pm25) {
@@ -54,6 +66,81 @@
         if (aqi <= 300) return { text: "Very Unhealthy", message: "Everyone may experience health effects. Stay indoors with filtered air." };
         return { text: "Hazardous", message: "Dangerous air quality! Stay indoors." };
       }
+      
+      // --- TIME & WEATHER FUNCTIONS ---
+
+      // NEW: Function to display the local time
+      function displayLocalTime(timezoneOffsetSeconds) {
+        // Clear any previous interval to prevent multiple clocks running
+        if (localTimeInterval) {
+            clearInterval(localTimeInterval);
+        }
+
+        const timeElement = document.getElementById("localTime");
+
+        function updateClock() {
+            // Get the current time in milliseconds (UTC)
+            const utcTime = new Date().getTime();
+            
+            // Convert timezone offset from seconds to milliseconds and apply it
+            const localTimeMs = utcTime + (timezoneOffsetSeconds * 1000);
+            
+            // Create a Date object from the adjusted time
+            const localDate = new Date(localTimeMs);
+            
+            // Format the time and date
+            const timeString = localDate.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                timeZone: 'UTC' // Important: Use 'UTC' to correctly display the time based on the offset
+            });
+            const dateString = localDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                timeZone: 'UTC' // Important: Use 'UTC'
+            });
+
+            timeElement.textContent = `${dateString} | ${timeString}`;
+        }
+        
+        // Run immediately and then every second
+        updateClock();
+        localTimeInterval = setInterval(updateClock, 1000);
+      }
+      
+      // NEW: Function to fetch and display weather data
+      async function getWeather(lat, lon) {
+        // Use 'metric' units to get Celsius (°C)
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          
+          if (data.main) {
+            const temp = Math.round(data.main.temp);
+            const weatherDesc = data.weather[0].description;
+            const timezone = data.timezone; // Offset in seconds from UTC
+
+            document.getElementById("temperature").textContent = `Temperature: ${temp}°C`;
+            document.getElementById("currentWeather").textContent = weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
+            
+            // Start the local clock using the timezone offset
+            displayLocalTime(timezone);
+
+          } else {
+            document.getElementById("temperature").textContent = "Weather data unavailable.";
+            document.getElementById("currentWeather").textContent = "";
+            document.getElementById("localTime").textContent = "--:--";
+            if (localTimeInterval) clearInterval(localTimeInterval);
+          }
+        } catch (err) {
+          console.error("Error fetching weather data:", err);
+        }
+      }
+
+      // --- LOCATION & AQI FETCHING ---
 
       // Reusable function to get Location Name from Coordinates (Reverse Geocoding)
       async function getLocationName(lat, lon) {
@@ -63,7 +150,6 @@
           const data = await res.json();
           if (data.length > 0) {
             const location = data[0];
-            // Show the name and country (or state if available)
             const display = location.state ? `${location.name}, ${location.state}, ${location.country}` : `${location.name}, ${location.country}`;
             document.getElementById("locationName").textContent = display;
             return display;
@@ -82,7 +168,7 @@
         const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
         try {
           const res = await fetch(url);
-          const data = await res.json();
+          const data = await await res.json();
           const pm25 = data.list[0].components.pm2_5;
           const aqi = pm25ToAQI(pm25);
           const info = getAqiMeaning(aqi);
@@ -96,8 +182,18 @@
           console.error(err);
         }
       }
+      
+      // Combined function to call all data APIs
+      function fetchAllData(lat, lon) {
+        getAirQuality(lat, lon);
+        getLocationName(lat, lon);
+        getWeather(lat, lon); // New call
+      }
 
-      // NEW: Function to get coordinates from a City Name (Direct Geocoding)
+
+      // --- USER INPUT HANDLER ---
+
+      // Function to get coordinates from a City Name (Direct Geocoding)
       async function getCoordinatesByCityName(cityName) {
         const encodedCity = encodeURIComponent(cityName);
         const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedCity}&limit=1&appid=${apiKey}`;
@@ -109,12 +205,8 @@
           if (data.length > 0) {
             const { lat, lon } = data[0];
             
-            // Update UI with the new location and AQI
-            getAirQuality(lat, lon);
-            
-            // Use the name returned by the geocoding API for immediate display
-            const display = data[0].state ? `${data[0].name}, ${data[0].state}, ${data[0].country}` : `${data[0].name}, ${data[0].country}`;
-            document.getElementById("locationName").textContent = display;
+            // Fetch all data for the searched location
+            fetchAllData(lat, lon);
 
           } else {
             document.getElementById("status").textContent = `Location "${cityName}" not found.`;
@@ -122,6 +214,10 @@
             document.getElementById("aqiValue").textContent = "";
             document.getElementById("meaning").textContent = "";
             document.getElementById("desc").textContent = "";
+            document.getElementById("localTime").textContent = "--:--";
+            document.getElementById("currentWeather").textContent = "";
+            document.getElementById("temperature").textContent = "";
+            if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
           document.getElementById("status").textContent = "Error during city search.";
@@ -151,9 +247,8 @@
             const { latitude, longitude } = pos.coords;
             document.getElementById("status").textContent = "Fetching your current location data...";
             
-            // Get both AQI and Location Name for the auto-detected location
-            getAirQuality(latitude, longitude);
-            getLocationName(latitude, longitude);
+            // Fetch all data for the auto-detected location
+            fetchAllData(latitude, longitude);
           },
           () => {
             document.getElementById("status").textContent = "Failed to get location. Please use the search bar.";

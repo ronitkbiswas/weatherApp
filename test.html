@@ -3,25 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Air Pollution App</title>
+    <title>Air Quality</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: "Poppins", sans-serif;
         text-align: center;
-        background: linear-gradient(to right, #56ccf2, #2f80ed);
+        background: linear-gradient(to right, #74ebd5, #acb6e5);
         color: white;
         margin: 0;
-        padding: 40px;
+        padding: 50px;
       }
       .card {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.15);
         border-radius: 15px;
-        padding: 25px;
+        padding: 30px;
         display: inline-block;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        min-width: 250px;
       }
       h1 {
+        font-size: 26px;
         margin-bottom: 10px;
+      }
+      h2 {
+        font-size: 22px;
+        margin-top: 5px;
       }
       p {
         font-size: 18px;
@@ -30,69 +36,60 @@
     </style>
   </head>
   <body>
-    <h1>🌫️ Air Quality Index (AQI)</h1>
+    <h1>🌤️ Air Quality</h1>
     <div class="card">
       <p id="status">Detecting location...</p>
-      <p id="aqi"></p>
-      <p id="pm25"></p>
-      <p id="pm10"></p>
+      <h2 id="aqiText"></h2>
+      <p id="meaning"></p>
     </div>
 
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
 
-      function getAqiMeaning(aqi) {
-        const meanings = {
-          1: "Good ✅",
-          2: "Fair 🙂",
-          3: "Moderate 😐",
-          4: "Poor 😷",
-          5: "Very Poor ☠️",
-        };
-        return meanings[aqi] || "Unknown";
-      }
+      const aqiLevels = {
+        1: { label: "Good", desc: "Air quality is good. Enjoy your day!", color: "#4CAF50" },
+        2: { label: "Fair", desc: "Air quality is acceptable.", color: "#CDDC39" },
+        3: { label: "Moderate", desc: "Sensitive people should limit outdoor activity.", color: "#FFC107" },
+        4: { label: "Poor", desc: "Unhealthy air for everyone. Try to stay indoors.", color: "#FF5722" },
+        5: { label: "Very Poor", desc: "Hazardous! Avoid going outside.", color: "#D32F2F" },
+      };
 
       async function getAirPollution(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
         try {
           const res = await fetch(url);
-          if (!res.ok) throw new Error("Failed to fetch data");
           const data = await res.json();
+          const aqi = data.list[0].main.aqi;
 
-          const info = data.list[0];
-          const aqi = info.main.aqi;
-          const { pm2_5, pm10 } = info.components;
-
-          document.getElementById("status").textContent = `AQI Level: ${aqi} (${getAqiMeaning(aqi)})`;
-          document.getElementById("aqi").textContent = `AQI Value: ${aqi}`;
-          document.getElementById("pm25").textContent = `PM2.5: ${pm2_5} µg/m³`;
-          document.getElementById("pm10").textContent = `PM10: ${pm10} µg/m³`;
+          const info = aqiLevels[aqi];
+          document.querySelector(".card").style.background = info.color;
+          document.getElementById("status").textContent = `Air Quality Index: ${aqi}`;
+          document.getElementById("aqiText").textContent = `${info.label}`;
+          document.getElementById("meaning").textContent = info.desc;
         } catch (err) {
           document.getElementById("status").textContent = "Error fetching data.";
           console.error(err);
         }
       }
 
-      function getAirPollutionByLocation() {
+      function getLocation() {
         if (!navigator.geolocation) {
           document.getElementById("status").textContent = "Geolocation not supported.";
           return;
         }
-
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
             document.getElementById("status").textContent = "Fetching air quality...";
             getAirPollution(latitude, longitude);
           },
-          (err) => {
+          () => {
             document.getElementById("status").textContent = "Failed to get location.";
-            console.error(err.message);
           }
         );
       }
 
-      getAirPollutionByLocation();
+      getLocation();
     </script>
   </body>
 </html>

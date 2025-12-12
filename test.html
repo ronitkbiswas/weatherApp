@@ -46,7 +46,7 @@
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
       let localTimeInterval;
       
-      // --- AQI CALCULATION (UNCHANGED) ---
+      // --- AQI CALCULATION ---
 
       function pm25ToAQI(pm25) {
         const breakpoints = [
@@ -133,7 +133,7 @@
         }
       }
 
-      // --- TIME & WEATHER FUNCTIONS (UNCHANGED) ---
+      // --- TIME & WEATHER FUNCTIONS ---
 
       function generateWeatherSummary(temp, weatherDesc, isNight) {
         const desc = weatherDesc.toLowerCase();
@@ -185,7 +185,7 @@
             // Determine if it is night 
             const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
 
-            // --- 1. Update Time Display ---
+            // --- 1. Update Time Display (UNCHANGED) ---
             const timeOptions = { 
                 hour: '2-digit', 
                 minute: '2-digit', 
@@ -204,14 +204,21 @@
             const dateString = localDate.toLocaleDateString('en-US', dateOptions);
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // --- 2. Update Sun Event Countdown ---
+            // --- 2. Update Sun Event Countdown (FIXED LOGIC) ---
             let nextEventTime, eventName, emoji;
 
-            if (currentSecondUTC < sunsetTime) {
+            if (currentSecondUTC < sunriseTime) {
+                // Case 1: Before today's sunrise (Late night/Early morning)
+                eventName = "Sunrise";
+                emoji = "🌅";
+                nextEventTime = sunriseTime; 
+            } else if (currentSecondUTC < sunsetTime) {
+                // Case 2: Between sunrise and sunset (Daytime)
                 eventName = "Sunset";
                 emoji = "🌇";
                 nextEventTime = sunsetTime;
             } else {
+                // Case 3: After sunset (Night)
                 eventName = "Sunrise";
                 emoji = "🌅";
                 nextEventTime = sunriseTime + 86400; // Tomorrow's sunrise
@@ -230,13 +237,13 @@
             }
 
 
-            // --- 3. Update Custom Summary ---
+            // --- 3. Update Custom Summary (UNCHANGED) ---
             if (!isNaN(temp)) {
                 summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
             }
         }
         
-        // --- STATIC SUN TIME DISPLAY ---
+        // --- STATIC SUN TIME DISPLAY (UNCHANGED) ---
         const sunriseDate = new Date(sunriseTime * 1000);
         const sunsetDate = new Date(sunsetTime * 1000);
         
@@ -287,7 +294,7 @@
         }
       }
 
-      // --- LOCATION & AQI FETCHING ---
+      // --- LOCATION & AQI FETCHING (UNCHANGED) ---
 
       async function getLocationName(lat, lon) {
         const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
@@ -319,12 +326,11 @@
           const res = await fetch(url);
           const data = await res.json();
           
-          // CRITICAL FIX: Check if PM2.5 data is available
           if (!data.list || !data.list[0] || !data.list[0].components || data.list[0].components.pm2_5 === undefined) {
              aqiValueElement.textContent = "AQI: N/A";
              meaningElement.textContent = "Data Unavailable";
              descElement.textContent = "No recent PM2.5 reading for this location.";
-             return; // Stop execution if data is missing
+             return; 
           }
 
           const pm25 = data.list[0].components.pm2_5;

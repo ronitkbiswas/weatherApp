@@ -4,7 +4,9 @@ const result = document.getElementById("result");
 const cityIp = document.getElementById("cityIp");
 const btn = document.getElementById("getWeatherBtn");
 
-// Manual city search
+///////////////////////////////////
+//  Manual city search
+///////////////////////////////////
 btn.addEventListener("click", async () => {
   const city = cityIp.value.trim();
   if (!city) {
@@ -51,19 +53,25 @@ btn.addEventListener("click", async () => {
     } else {
       g = "🌙 Silent Night";
     }
-    if (desc === "clear sky" && g === "🌙 Night") {
-      desc = "Night Sky is clear! Enjoy the vive ! 🏙️";
-    } else if (desc === "haze" && g === "🌙 Night") {
-      desc = "Cold hazy day with a greyish vive ! ☁️";
-    } else if (desc === "overcast clouds" && g === "🌙 Night") {
-      desc = "Cold hazy night with overcast clouds in the sky! ☁️";
-    }
     result.innerHTML = `
       <span style='font-size:22px'>${name}</span><br>
-          <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br><br>
+          <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br>
           <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
-        <br><br>
-          <span>${desc}</span>
+        <br>
+           <div style="margin-top:15px;font-size:14px;">
+          <span><b>feels like:</b> ${data.main.feels_like.toFixed(
+            0
+          )}°C</span> | 
+          <span><b>Now:</b> ${desc}</span> | <span><b>humidity:</b> ${
+      data.main.humidity
+    }%</span> | <span><b>wind speed: </b>${
+      data.wind.speed
+    } km/h</span> | <span><b>visibility:</b> ${
+      data.visibility / 1000
+    } km</span> | <span><b>pressure:</b> ${
+      data.main.pressure
+    } mb</span> | <span><b>clouds:</b> ${data.clouds.all}%</span>
+          </div>
     `;
     document.getElementById("myImageUp").classList.add("hidden");
   } catch (err) {
@@ -78,7 +86,7 @@ btn.addEventListener("click", async () => {
 ////////////////////////////////////////////////////////////////
 if (navigator.geolocation) {
   document.getElementById("myImage").classList.remove("hidden");
-  auto_city.textContent = "Detecting your location.....";
+  auto_city.textContent = "Detecting your location...";
   navigator.geolocation.getCurrentPosition(
     async (position) => {
       const lat = position.coords.latitude;
@@ -96,8 +104,9 @@ if (navigator.geolocation) {
         const data = await res.json();
         const temp = data.main.temp;
         let desc = data.weather[0].description;
-        const city = data.name || "Your current location";
-
+        const city = data.name || "Current location";
+        console.log(`Auto location city: ${city}`);
+        console.log(`Auto location data:`, data);
         let now = new Date();
         let hours24 = now.getHours(); // 0–23 (keep this for conditions)
         let minutes = now.getMinutes();
@@ -124,21 +133,29 @@ if (navigator.geolocation) {
         } else {
           g = "🌙 Silent Night";
         }
-        if (desc === "clear sky" && g === "🌙 Night") {
-          desc = "Night Sky is clear! Enjoy the vive ! 🏙️";
-        } else if (desc === "haze") {
-          desc = "Cold hazy day with a greyish vive ! ☁️";
-        } else if (desc === "overcast clouds" && g === "🌙 Night") {
-          desc = "Cold hazy night with overcast clouds in the sky! ☁️ 🍂";
-        }
         auto_city.innerHTML = `
-        <span style='color:darkgreen;font-weight:500;'>Your current location</span>
+        <span style='color:darkgreen;font-weight:500;'>Current location</span>
         <br><br>
-          <span style='font-size:22px'>${city}</span><br><br>
-          <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br><br>
-          <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
-        <br><br>
-          <span>${desc}</span>
+          <span style='font-size:22px'>${city}, ${
+          data.sys.country
+        }</span><br><br>
+          <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br>
+          <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span><br>
+
+          <div style="margin-top:15px;font-size:14px;">
+          <span><b>feels like:</b> ${data.main.feels_like.toFixed(
+            0
+          )}°C</span> | 
+          <span><b>Now:</b> ${desc}</span> | <span><b>humidity:</b> ${
+          data.main.humidity
+        }%</span> | <span><b>wind speed: </b>${
+          data.wind.speed
+        } km/h</span> | <span><b>visibility:</b> ${
+          data.visibility / 1000
+        } km</span> | <span><b>pressure:</b> ${
+          data.main.pressure
+        } mb</span> | <span><b>clouds:</b> ${data.clouds.all}%</span>
+          </div>
         `;
         document.getElementById("myImage").classList.add("hidden");
       } catch (err) {

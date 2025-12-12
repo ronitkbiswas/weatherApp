@@ -1,6 +1,6 @@
 .heading {
   font-size: 25px;
-  color: rgb(29, 23, 83);
+  color: rgb(0, 0, 0);
 }
 #cityIp {
   padding: 5px 20px;
@@ -11,9 +11,9 @@
 }
 #getWeatherBtn {
   padding: 5px 20px;
-  font-size: 17px;
+  font-size: 16px;
   border-radius: 5px;
-  box-shadow: 2px 2px 5px green;
+  box-shadow: 2px 2px 5px rgb(255, 254, 254);
 }
 body {
   margin: 0;
@@ -29,15 +29,25 @@ body {
 }
 
 .lD {
-  background-color: rgb(145, 144, 144);
-  padding: 2px;
-  box-sizing: border-box;
-}
-/* #result {
-  color: rgb(70, 71, 71);
+  color: rgb(40, 40, 40);
   font-size: 16px;
-  font-weight: 1000;
-} */
+  font-weight: 500;
+  margin-top: 10px;
+  background-color: #acacac;
+  padding: 2px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px black;
+}
+#result {
+  color: rgb(40, 40, 40);
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 10px;
+  background-color: #acacac;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px black;
+}
 .hidden {
   display: none;
 }

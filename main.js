@@ -43,17 +43,17 @@ btn.addEventListener("click", async () => {
     //16:00 (4pm) → 18:59(7pm)	Evening
     // 19:00(7pm) → 04:59(5am) Night
     if (hours24 >= 5 && hours24 < 12) {
-      let g = "🌅 Morning";
+      let g = "🌅 Good Morning";
     } else if (hours24 >= 12 && hours24 < 16) {
-      g = "☀️ Noon";
+      g = "☀️ High Noon";
     } else if (hours24 >= 16 && hours24 < 19) {
-      g = "🌇 Evening";
+      g = "🌇 Nice Evening";
     } else {
-      g = "🌙 Night";
+      g = "🌙 Silent Night";
     }
     if (desc === "clear sky" && g === "🌙 Night") {
       desc = "Night Sky is clear! Enjoy the vive ! 🏙️";
-    } else if (desc === "haze") {
+    } else if (desc === "haze" && g === "🌙 Night") {
       desc = "Cold hazy day with a greyish vive ! ☁️";
     } else if (desc === "overcast clouds" && g === "🌙 Night") {
       desc = "Cold hazy night with overcast clouds in the sky! ☁️";
@@ -116,13 +116,13 @@ if (navigator.geolocation) {
         //16:00 (4pm) → 18:59(7pm)	Evening
         // 19:00(7pm) → 04:59(5am) Night
         if (hours24 >= 5 && hours24 < 12) {
-          let g = "🌅 Morning";
+          let g = "🌅 Good Morning";
         } else if (hours24 >= 12 && hours24 < 16) {
-          g = "☀️ Noon";
+          g = "☀️ High Noon";
         } else if (hours24 >= 16 && hours24 < 19) {
-          g = "🌇 Evening";
+          g = "🌇 Nice Evening";
         } else {
-          g = "🌙 Night";
+          g = "🌙 Silent Night";
         }
         if (desc === "clear sky" && g === "🌙 Night") {
           desc = "Night Sky is clear! Enjoy the vive ! 🏙️";
@@ -134,7 +134,7 @@ if (navigator.geolocation) {
         auto_city.innerHTML = `
         <span style='color:darkgreen;font-weight:500;'>Your current location</span>
         <br><br>
-          <span style='font-size:22px'>${city}</span><br>
+          <span style='font-size:22px'>${city}</span><br><br>
           <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br><br>
           <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span>
         <br><br>

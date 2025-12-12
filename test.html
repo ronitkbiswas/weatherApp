@@ -102,26 +102,28 @@
         const summaryElement = document.getElementById("weatherSummary");
         const sunEventElement = document.getElementById("sunEvent");
         
-        // Get initial weather values for summary generation
         const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
         function updateClock() {
-            const now = new Date();
-            
-            // 1. Calculate current UTC time (milliseconds)
-            const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000); 
+            // --- CRITICAL FIX APPLIED HERE ---
+            // 1. Get the current UTC time in milliseconds. (Date.now() is always UTC epoch time)
+            const utcMs = Date.now(); 
             
             // 2. Calculate the remote local time (milliseconds) by adding the location's offset
+            // timezoneOffsetSeconds is the difference from UTC (e.g., IST is +19800 seconds)
             const localTimeMs = utcMs + (timezoneOffsetSeconds * 1000);
             
             const localDate = new Date(localTimeMs);
             const currentSecondUTC = Math.floor(localTimeMs / 1000); 
+            // --- END CRITICAL FIX ---
+
 
             // Determine if it is night (current time is after sunset OR before sunrise)
             const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
 
             // --- 1. Update Time Display ---
+            // Use localDate and format it based on the remote offset
             const timeOptions = { 
                 hour: '2-digit', 
                 minute: '2-digit', 
@@ -143,7 +145,6 @@
             // --- 2. Update Sun Event Countdown ---
             let nextEventTime, eventName, emoji;
 
-            // Logic to determine the NEXT sun event:
             if (currentSecondUTC < sunsetTime) {
                 // If before sunset, the next event is sunset (today)
                 eventName = "Sunset";

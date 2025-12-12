@@ -23,6 +23,8 @@
 
       <p id="localTime" style="font-size: 20px;">--:--</p>
 
+      <p id="sunTimeRemaining" style="font-weight: 500;"></p>
+
       <h3 id="currentWeather"></h3>
       <p id="temperature"></p>
       
@@ -67,23 +69,20 @@
       
       // --- TIME & WEATHER FUNCTIONS ---
 
-      // NEW: Function to generate the creative one-line summary
       function generateWeatherSummary(temp, weatherDesc, isNight) {
         const desc = weatherDesc.toLowerCase();
         let summary = '';
-        const emojis = isNight ? ' 🌙✨' : ' ☀️';
+        let emojis = isNight ? ' 🌙✨' : ' ☀️';
         
-        // Determine the temperature feel
         let tempFeel = (temp < 10) ? 'freezing' : (temp < 18) ? 'chilly' : (temp < 25) ? 'pleasant' : 'warm';
 
-        // Custom descriptions based on weather
         if (desc.includes('clear')) {
             summary = isNight ? `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and clear night sky!` : `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and sunny day!`;
         } else if (desc.includes('clouds')) {
             summary = isNight ? `Overcast and dark night with patchy clouds.` : `Mildly cloudy day with ${tempFeel} air.`;
         } else if (desc.includes('rain')) {
             summary = `A wet, ${tempFeel} day with steady rain.`;
-            emojis = ' 🌧️☔'; // Override for rain
+            emojis = ' 🌧️☔';
         } else if (desc.includes('mist') || desc.includes('fog') || desc.includes('haze')) {
             summary = isNight ? `A ${tempFeel} hazy night with low visibility!` : `A ${tempFeel} hazy morning with a soft glow.`;
         } else {
@@ -93,13 +92,32 @@
         return summary + emojis;
       }
 
-      function displayLocalTime(timezoneOffsetSeconds, sunriseUTC, sunsetUTC) {
+      // NEW: Function to format the remaining time
+      function formatTimeRemaining(timeDiffSeconds) {
+        const totalMinutes = Math.round(timeDiffSeconds / 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        
+        let result = '';
+        if (hours > 0) {
+            result += `${hours} hour${hours > 1 ? 's' : ''}`;
+        }
+        if (minutes > 0) {
+            if (result.length > 0) result += ' and ';
+            result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        }
+        return result || 'less than a minute';
+      }
+
+      // Updated function to display the clock and time remaining
+      function displayLocalTime(timezoneOffsetSeconds, sunriseUTCSeconds, sunsetUTCSeconds) {
         if (localTimeInterval) {
             clearInterval(localTimeInterval);
         }
 
         const timeElement = document.getElementById("localTime");
         const summaryElement = document.getElementById("weatherSummary");
+        const remainingElement = document.getElementById("sunTimeRemaining");
         const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
         const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
@@ -109,15 +127,45 @@
             const localDate = new Date(localTimeMs);
             const currentSecondUTC = Math.floor(localTimeMs / 1000);
 
-            // Determine if it is night (current time is after sunset and before sunrise)
-            const isNight = (currentSecondUTC > sunsetUTC) || (currentSecondUTC < sunriseUTC);
+            // 1. Determine the next event and the difference
+            let nextEventTime, eventName;
+
+            // Check if current time is after sunset OR before sunrise (i.e., it's night)
+            if (currentSecondUTC > sunsetUTCSeconds || currentSecondUTC < sunriseUTCSeconds) {
+                // If it's night, the next event is sunrise
+                eventName = "Sunrise";
+                // If past midnight, use today's (already passed) sunrise for calculation, but check for next day's sunrise
+                if (currentSecondUTC > sunsetUTCSeconds) {
+                    // It's night, but on the same day as the sunset. The next sunrise is tomorrow.
+                    // Assuming sunrise/sunset is roughly 24 hours apart (86400 seconds)
+                    nextEventTime = sunriseUTCSeconds + 86400; 
+                } else {
+                    // It's early morning before sunrise (same day)
+                    nextEventTime = sunriseUTCSeconds;
+                }
+            } else {
+                // If current time is between sunrise and sunset (i.e., it's day)
+                eventName = "Sunset";
+                nextEventTime = sunsetUTCSeconds;
+            }
+
+            const timeDiffSeconds = nextEventTime - currentSecondUTC;
             
-            // Update time display
+            // 2. Format the time and date
             const timeString = localDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
             const dateString = localDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
             timeElement.textContent = `${dateString} | ${timeString}`;
             
-            // Update custom summary (must check if data is available)
+            // 3. Format the next event time for the display message
+            const nextEventDate = new Date(nextEventTime * 1000);
+            const nextEventTimeString = nextEventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+
+            // 4. Update the "Time Remaining" element
+            const remainingFormatted = formatTimeRemaining(timeDiffSeconds);
+            remainingElement.textContent = `${eventName} in ${remainingFormatted}: ${nextEventTimeString}`;
+
+            // 5. Update custom summary
+            const isNight = eventName === "Sunrise"; // Simple approximation: if the next event is sunrise, it's night.
             if (!isNaN(temp)) {
                 summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
             }
@@ -137,12 +185,16 @@
             const temp = Math.round(data.main.temp);
             const weatherDesc = data.weather[0].description;
             const timezone = data.timezone; 
-            const sunriseUTC = data.sys.sunrise + timezone; // Sunrise time in local UTC equivalent seconds
-            const sunsetUTC = data.sys.sunset + timezone; // Sunset time in local UTC equivalent seconds
+            
+            // Sunrise/Sunset times from OpenWeatherMap are in UTC. 
+            // We pass the raw UTC times to displayLocalTime, which will handle the local time calculation.
+            const sunriseUTC = data.sys.sunrise; 
+            const sunsetUTC = data.sys.sunset; 
 
             document.getElementById("temperature").textContent = `Temperature: ${temp}°C`;
             document.getElementById("currentWeather").textContent = weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
             
+            // Pass timezone offset and raw UTC sunrise/sunset
             displayLocalTime(timezone, sunriseUTC, sunsetUTC);
 
           } else {
@@ -150,6 +202,7 @@
             document.getElementById("currentWeather").textContent = "";
             document.getElementById("localTime").textContent = "--:--";
             document.getElementById("weatherSummary").textContent = "";
+            document.getElementById("sunTimeRemaining").textContent = "";
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {

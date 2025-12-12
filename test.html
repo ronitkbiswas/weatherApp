@@ -19,6 +19,8 @@
       
       <h2 id="locationName"></h2>
       
+      <p id="weatherSummary" style="font-style: italic; font-weight: bold;"></p>
+
       <p id="localTime" style="font-size: 20px;">--:--</p>
 
       <h3 id="currentWeather"></h3>
@@ -33,11 +35,10 @@
 
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
-      let localTimeInterval; // Variable to store the interval for the clock
-
+      let localTimeInterval;
+      
       // --- AQI CALCULATION ---
 
-      // Convert PM2.5 to AQI (US EPA Standard)
       function pm25ToAQI(pm25) {
         const breakpoints = [
           { cLow: 0, cHigh: 12, aLow: 0, aHigh: 50 },
@@ -47,12 +48,9 @@
           { cLow: 150.5, cHigh: 250.4, aLow: 201, aHigh: 300 },
           { cLow: 250.5, cHigh: 500.4, aLow: 301, aHigh: 500 },
         ];
-
         for (let b of breakpoints) {
           if (pm25 >= b.cLow && pm25 <= b.cHigh) {
-            return Math.round(
-              ((b.aHigh - b.aLow) / (b.cHigh - b.cLow)) * (pm25 - b.cLow) + b.aLow
-            );
+            return Math.round(((b.aHigh - b.aLow) / (b.cHigh - b.cLow)) * (pm25 - b.cLow) + b.aLow);
           }
         }
         return 500;
@@ -69,50 +67,67 @@
       
       // --- TIME & WEATHER FUNCTIONS ---
 
-      // NEW: Function to display the local time
-      function displayLocalTime(timezoneOffsetSeconds) {
-        // Clear any previous interval to prevent multiple clocks running
+      // NEW: Function to generate the creative one-line summary
+      function generateWeatherSummary(temp, weatherDesc, isNight) {
+        const desc = weatherDesc.toLowerCase();
+        let summary = '';
+        const emojis = isNight ? ' 🌙✨' : ' ☀️';
+        
+        // Determine the temperature feel
+        let tempFeel = (temp < 10) ? 'freezing' : (temp < 18) ? 'chilly' : (temp < 25) ? 'pleasant' : 'warm';
+
+        // Custom descriptions based on weather
+        if (desc.includes('clear')) {
+            summary = isNight ? `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and clear night sky!` : `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and sunny day!`;
+        } else if (desc.includes('clouds')) {
+            summary = isNight ? `Overcast and dark night with patchy clouds.` : `Mildly cloudy day with ${tempFeel} air.`;
+        } else if (desc.includes('rain')) {
+            summary = `A wet, ${tempFeel} day with steady rain.`;
+            emojis = ' 🌧️☔'; // Override for rain
+        } else if (desc.includes('mist') || desc.includes('fog') || desc.includes('haze')) {
+            summary = isNight ? `A ${tempFeel} hazy night with low visibility!` : `A ${tempFeel} hazy morning with a soft glow.`;
+        } else {
+            summary = `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and ${desc} conditions.`;
+        }
+        
+        return summary + emojis;
+      }
+
+      function displayLocalTime(timezoneOffsetSeconds, sunriseUTC, sunsetUTC) {
         if (localTimeInterval) {
             clearInterval(localTimeInterval);
         }
 
         const timeElement = document.getElementById("localTime");
+        const summaryElement = document.getElementById("weatherSummary");
+        const weatherDesc = document.getElementById("currentWeather").textContent.toLowerCase();
+        const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
 
         function updateClock() {
-            // Get the current time in milliseconds (UTC)
             const utcTime = new Date().getTime();
-            
-            // Convert timezone offset from seconds to milliseconds and apply it
             const localTimeMs = utcTime + (timezoneOffsetSeconds * 1000);
-            
-            // Create a Date object from the adjusted time
             const localDate = new Date(localTimeMs);
-            
-            // Format the time and date
-            const timeString = localDate.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit', 
-                timeZone: 'UTC' // Important: Use 'UTC' to correctly display the time based on the offset
-            });
-            const dateString = localDate.toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                timeZone: 'UTC' // Important: Use 'UTC'
-            });
+            const currentSecondUTC = Math.floor(localTimeMs / 1000);
 
+            // Determine if it is night (current time is after sunset and before sunrise)
+            const isNight = (currentSecondUTC > sunsetUTC) || (currentSecondUTC < sunriseUTC);
+            
+            // Update time display
+            const timeString = localDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
+            const dateString = localDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
             timeElement.textContent = `${dateString} | ${timeString}`;
+            
+            // Update custom summary (must check if data is available)
+            if (!isNaN(temp)) {
+                summaryElement.textContent = generateWeatherSummary(temp, weatherDesc, isNight);
+            }
         }
         
-        // Run immediately and then every second
         updateClock();
         localTimeInterval = setInterval(updateClock, 1000);
       }
       
-      // NEW: Function to fetch and display weather data
       async function getWeather(lat, lon) {
-        // Use 'metric' units to get Celsius (°C)
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
         try {
           const res = await fetch(url);
@@ -121,18 +136,20 @@
           if (data.main) {
             const temp = Math.round(data.main.temp);
             const weatherDesc = data.weather[0].description;
-            const timezone = data.timezone; // Offset in seconds from UTC
+            const timezone = data.timezone; 
+            const sunriseUTC = data.sys.sunrise + timezone; // Sunrise time in local UTC equivalent seconds
+            const sunsetUTC = data.sys.sunset + timezone; // Sunset time in local UTC equivalent seconds
 
             document.getElementById("temperature").textContent = `Temperature: ${temp}°C`;
             document.getElementById("currentWeather").textContent = weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
             
-            // Start the local clock using the timezone offset
-            displayLocalTime(timezone);
+            displayLocalTime(timezone, sunriseUTC, sunsetUTC);
 
           } else {
             document.getElementById("temperature").textContent = "Weather data unavailable.";
             document.getElementById("currentWeather").textContent = "";
             document.getElementById("localTime").textContent = "--:--";
+            document.getElementById("weatherSummary").textContent = "";
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
@@ -140,9 +157,8 @@
         }
       }
 
-      // --- LOCATION & AQI FETCHING ---
+      // --- LOCATION & AQI FETCHING (UNCHANGED) ---
 
-      // Reusable function to get Location Name from Coordinates (Reverse Geocoding)
       async function getLocationName(lat, lon) {
         const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
         try {
@@ -163,17 +179,15 @@
         }
       }
 
-      // Reusable function to get Air Quality for given coordinates
       async function getAirQuality(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
         try {
           const res = await fetch(url);
-          const data = await await res.json();
+          const data = await res.json();
           const pm25 = data.list[0].components.pm2_5;
           const aqi = pm25ToAQI(pm25);
           const info = getAqiMeaning(aqi);
 
-          document.getElementById("status").textContent = "Data Loaded";
           document.getElementById("aqiValue").textContent = `AQI: ${aqi}`;
           document.getElementById("meaning").textContent = info.text;
           document.getElementById("desc").textContent = info.message;
@@ -183,17 +197,16 @@
         }
       }
       
-      // Combined function to call all data APIs
       function fetchAllData(lat, lon) {
+        document.getElementById("status").textContent = "Fetching data...";
         getAirQuality(lat, lon);
         getLocationName(lat, lon);
-        getWeather(lat, lon); // New call
+        getWeather(lat, lon);
       }
 
 
-      // --- USER INPUT HANDLER ---
+      // --- USER INPUT HANDLER (UNCHANGED) ---
 
-      // Function to get coordinates from a City Name (Direct Geocoding)
       async function getCoordinatesByCityName(cityName) {
         const encodedCity = encodeURIComponent(cityName);
         const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedCity}&limit=1&appid=${apiKey}`;
@@ -204,20 +217,9 @@
           
           if (data.length > 0) {
             const { lat, lon } = data[0];
-            
-            // Fetch all data for the searched location
             fetchAllData(lat, lon);
-
           } else {
             document.getElementById("status").textContent = `Location "${cityName}" not found.`;
-            document.getElementById("locationName").textContent = "";
-            document.getElementById("aqiValue").textContent = "";
-            document.getElementById("meaning").textContent = "";
-            document.getElementById("desc").textContent = "";
-            document.getElementById("localTime").textContent = "--:--";
-            document.getElementById("currentWeather").textContent = "";
-            document.getElementById("temperature").textContent = "";
-            if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
           document.getElementById("status").textContent = "Error during city search.";
@@ -225,7 +227,6 @@
         }
       }
 
-      // Function triggered by the search button
       function searchLocation() {
         const cityName = document.getElementById("cityInput").value.trim();
         if (cityName) {
@@ -235,7 +236,6 @@
         }
       }
 
-      // Original function to get location on page load (Auto-Location)
       function getLocation() {
         if (!navigator.geolocation) {
           document.getElementById("status").textContent = "Geolocation not supported. Please use the search bar.";
@@ -245,9 +245,6 @@
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
-            document.getElementById("status").textContent = "Fetching your current location data...";
-            
-            // Fetch all data for the auto-detected location
             fetchAllData(latitude, longitude);
           },
           () => {

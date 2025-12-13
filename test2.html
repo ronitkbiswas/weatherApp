@@ -3,118 +3,145 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Air Quality & Weather</title>
+    <title>weatherApp (v4.0)</title>
     <style>
       /* --- Base Styles --- */
       body {
         font-family: Arial, sans-serif;
         color: #333;
-        /* Default background - applied before JS runs */
         background: linear-gradient(135deg, #f0f8ff, #e0ffff);
         min-height: 100vh;
         margin: 0;
         padding: 20px;
         transition: background 3s ease-in-out, background-size 3s ease-in-out;
+        /* NEW: Center the content on the body */
+        text-align: center;
       }
-      
+
       /* Container for visual clarity on dynamic background */
       div {
-          max-width: 600px;
-          margin: 0 auto;
-          background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background for content */
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto; /* Ensures container is centered */
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* NEW: Center text within the container */
+        text-align: center;
       }
-      
-      /* --- Animated Background Classes --- */
+
+      /* Temperature Heading Style */
+      #temperatureHeading {
+        font-size: 3em;
+        font-weight: bold;
+        margin: 0 0 5px 0;
+        /* Inherits text-align: center from the div */
+      }
+
+      /* Input and button container centering (redundant due to div center, but good practice) */
+      #cityInput,
+      button {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      /* Map centering */
+      #mapContainer iframe {
+        display: block;
+        margin: 0 auto;
+      }
+
+      /* --- Animated Background Classes (UNCHANGED) --- */
 
       /* Helper for animation */
       @keyframes gradientAnimation {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
       }
 
       /* Clear Day: Bright blue to light gold */
       .clear-day-bg {
-          background: linear-gradient(45deg, #87ceeb, #ffd700, #4682b4);
-          background-size: 300% 300%;
-          animation: gradientAnimation 20s ease infinite;
+        background: linear-gradient(45deg, #87ceeb, #ffd700, #4682b4);
+        background-size: 300% 300%;
+        animation: gradientAnimation 20s ease infinite;
       }
 
       /* Clear Night: Dark blue/purple with stars effect */
       .clear-night-bg {
-          background: linear-gradient(135deg, #000033, #191970, #4b0082);
-          background-size: 300% 300%;
-          animation: gradientAnimation 30s ease infinite;
-          color: #f0f8ff; /* Lighten text for contrast */
+        background: linear-gradient(135deg, #000033, #191970, #4b0082);
+        background-size: 300% 300%;
+        animation: gradientAnimation 30s ease infinite;
+        color: #f0f8ff;
       }
       .clear-night-bg div {
-          background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.7);
       }
 
       /* Cloudy Day: Grey/white to pale blue */
       .cloudy-day-bg {
-          background: linear-gradient(160deg, #b0c4de, #f5f5f5, #a9a9a9);
-          background-size: 200% 200%;
-          animation: gradientAnimation 40s linear infinite;
+        background: linear-gradient(160deg, #b0c4de, #f5f5f5, #a9a9a9);
+        background-size: 200% 200%;
+        animation: gradientAnimation 40s linear infinite;
       }
 
       /* Cloudy Night: Dark grey/indigo */
       .cloudy-night-bg {
-          background: linear-gradient(135deg, #36454F, #1C2833);
-          background-size: 150% 150%;
-          animation: gradientAnimation 50s ease infinite;
-          color: #ccc;
+        background: linear-gradient(135deg, #36454f, #1c2833);
+        background-size: 150% 150%;
+        animation: gradientAnimation 50s ease infinite;
+        color: #ccc;
       }
       .cloudy-night-bg div {
-          background: rgba(0, 0, 0, 0.7);
-      }
-      
-      /* Rain/Mist/Haze: Muted blue-grey */
-      .rain-mist-bg {
-          background: linear-gradient(180deg, #708090, #c0c0c0, #696969);
-          background-size: 200% 200%;
-          animation: gradientAnimation 35s ease infinite reverse;
+        background: rgba(0, 0, 0, 0.7);
       }
 
+      /* Rain/Mist/Haze: Muted blue-grey */
+      .rain-mist-bg {
+        background: linear-gradient(180deg, #708090, #c0c0c0, #696969);
+        background-size: 200% 200%;
+        animation: gradientAnimation 35s ease infinite reverse;
+      }
     </style>
   </head>
   <body id="body">
-    <h1>Air Quality Index (AQI)</h1>
-
     <div>
-      <input type="text" id="cityInput" placeholder="Enter City or Location Name" />
-      <button onclick="searchLocation()">Search AQI</button>
+      <input
+        type="text"
+        id="cityInput"
+        placeholder="Enter City or Location"
+      /><br />
+      <button onclick="searchLocation()">🍂 Check Weather</button>
     </div>
-    <br>
-    
+    <br />
+
     <div>
-      <p id="status">Detecting location...</p>
-      
-      <h2 id="locationName"></h2>
-      
-      <p id="weatherSummary" style="font-style: italic; font-weight: bold;"></p>
+      <span id="status">Detecting location...</span>
+      <h3 id="locationName"></h3>
+      <h2 id="temperatureHeading"></h2>
+      <h3 id="currentWeather"></h3>
+      <p id="weatherSummary" style="font-style: italic; font-weight: bold"></p>
+      <p id="localTime" style="font-size: 15px">--:--</p>
+      <p id="sunEvent" style="font-size: 16px"></p>
+      <p id="tomorrowForecast" style="font-style: italic"></p>
 
-      <p id="localTime" style="font-size: 20px;">--:--</p>
+      <div
+        id="mapContainer"
+        style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
+      ></div>
 
-      <p id="sunEvent" style="font-size: 18px;"></p>
-
-      <p id="tomorrowForecast" style="font-style: italic;"></p>
-
-      <div id="mapContainer" style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc;">
-          </div>
-      
-      <div id="sunTimes" style="font-size: 16px;">
-          <p id="sunriseTime"></p>
-          <p id="sunsetTime"></p>
+      <div id="sunTimes" style="font-size: 16px">
+        <p id="sunriseTime"></p>
+        <p id="sunsetTime"></p>
       </div>
 
-      <h3 id="currentWeather"></h3>
-      <p id="temperature"></p>
-      
-      <hr>
+      <hr />
 
       <h2 id="aqiValue"></h2>
       <p id="meaning"></p>
@@ -124,29 +151,33 @@
     <script>
       const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
       let localTimeInterval;
-      
-      // --- BACKGROUND ANIMATION LOGIC (NEW) ---
-      function setBackground(weatherDesc, isNight) {
-          const body = document.getElementById('body');
-          const currentClass = body.className;
-          let newClass = '';
-          
-          const desc = weatherDesc.toLowerCase();
 
-          if (desc.includes('clear') || desc.includes('sun')) {
-              newClass = isNight ? 'clear-night-bg' : 'clear-day-bg';
-          } else if (desc.includes('rain') || desc.includes('mist') || desc.includes('fog') || desc.includes('haze')) {
-              newClass = 'rain-mist-bg';
-          } else if (desc.includes('cloud')) {
-              newClass = isNight ? 'cloudy-night-bg' : 'cloudy-day-bg';
-          } else {
-              // Default fallback
-              newClass = isNight ? 'cloudy-night-bg' : 'cloudy-day-bg';
-          }
-          
-          if (currentClass !== newClass) {
-              body.className = newClass;
-          }
+      // --- BACKGROUND ANIMATION LOGIC (UNCHANGED) ---
+      function setBackground(weatherDesc, isNight) {
+        const body = document.getElementById("body");
+        const currentClass = body.className;
+        let newClass = "";
+
+        const desc = weatherDesc.toLowerCase();
+
+        if (desc.includes("clear") || desc.includes("sun")) {
+          newClass = isNight ? "clear-night-bg" : "clear-day-bg";
+        } else if (
+          desc.includes("rain") ||
+          desc.includes("mist") ||
+          desc.includes("fog") ||
+          desc.includes("haze")
+        ) {
+          newClass = "rain-mist-bg";
+        } else if (desc.includes("cloud")) {
+          newClass = isNight ? "cloudy-night-bg" : "cloudy-day-bg";
+        } else {
+          newClass = isNight ? "cloudy-night-bg" : "cloudy-day-bg";
+        }
+
+        if (currentClass !== newClass) {
+          body.className = newClass;
+        }
       }
 
       // --- AQI CALCULATION (UNCHANGED) ---
@@ -162,31 +193,61 @@
         ];
         for (let b of breakpoints) {
           if (pm25 >= b.cLow && pm25 <= b.cHigh) {
-            return Math.round(((b.aHigh - b.aLow) / (b.cHigh - b.cLow)) * (pm25 - b.cLow) + b.aLow);
+            return Math.round(
+              ((b.aHigh - b.aLow) / (b.cHigh - b.cLow)) * (pm25 - b.cLow) +
+                b.aLow
+            );
           }
         }
         return 500;
       }
 
       function getAqiMeaning(aqi) {
-        if (aqi <= 50) return { text: "Good", message: "Air quality is excellent. Great time for outdoor activities!" };
-        if (aqi <= 100) return { text: "Moderate", message: "Air quality is acceptable. Sensitive people should take it easy outdoors." };
-        if (aqi <= 150) return { text: "Unhealthy for Sensitive", message: "Those with asthma or allergies should limit outdoor exposure." };
-        if (aqi <= 200) return { text: "Unhealthy", message: "Air quality is poor. Avoid prolonged outdoor activity." };
-        if (aqi <= 300) return { text: "Very Unhealthy", message: "Everyone may experience health effects. Stay indoors with filtered air." };
-        return { text: "Hazardous", message: "Dangerous air quality! Stay indoors." };
+        if (aqi <= 50)
+          return {
+            text: "Good",
+            message:
+              "Air quality is excellent. Great time for outdoor activities!",
+          };
+        if (aqi <= 100)
+          return {
+            text: "Moderate",
+            message:
+              "Air quality is acceptable. Sensitive people should take it easy outdoors.",
+          };
+        if (aqi <= 150)
+          return {
+            text: "Unhealthy for Sensitive",
+            message:
+              "Those with asthma or allergies should limit outdoor exposure.",
+          };
+        if (aqi <= 200)
+          return {
+            text: "Unhealthy",
+            message: "Air quality is poor. Avoid prolonged outdoor activity.",
+          };
+        if (aqi <= 300)
+          return {
+            text: "Very Unhealthy",
+            message:
+              "Everyone may experience health effects. Stay indoors with filtered air.",
+          };
+        return {
+          text: "Hazardous",
+          message: "Dangerous air quality! Stay indoors.",
+        };
       }
-      
+
       // --- FORECAST FUNCTION (UNCHANGED) ---
 
       async function getForecast(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
         const forecastElement = document.getElementById("tomorrowForecast");
-        
+
         try {
           const res = await fetch(url);
           const data = await res.json();
-          
+
           if (!data.list) {
             forecastElement.textContent = "Forecast unavailable.";
             return;
@@ -195,41 +256,44 @@
           const today = new Date();
           const tomorrow = new Date(today);
           tomorrow.setDate(tomorrow.getDate() + 1);
-          
-          const tomorrowDateString = tomorrow.toISOString().split('T')[0];
-          
-          let tomorrowWeather = { rain: false, wind: false, description: 'Clear' };
+
+          const tomorrowDateString = tomorrow.toISOString().split("T")[0];
+
+          let tomorrowWeather = {
+            rain: false,
+            wind: false,
+            description: "Clear",
+          };
 
           for (let item of data.list) {
             if (item.dt_txt.startsWith(tomorrowDateString)) {
-                const desc = item.weather[0].description.toLowerCase();
+              const desc = item.weather[0].description.toLowerCase();
 
-                if (desc.includes('rain') || desc.includes('shower')) {
-                    tomorrowWeather.rain = true;
-                }
-                if (item.wind.speed > 10) {
-                    tomorrowWeather.wind = true;
-                }
-                
-                if (!tomorrowWeather.rain && !tomorrowWeather.wind) {
-                    tomorrowWeather.description = desc;
-                }
+              if (desc.includes("rain") || desc.includes("shower")) {
+                tomorrowWeather.rain = true;
+              }
+              if (item.wind.speed > 10) {
+                tomorrowWeather.wind = true;
+              }
+
+              if (!tomorrowWeather.rain && !tomorrowWeather.wind) {
+                tomorrowWeather.description = desc;
+              }
             }
           }
 
-          let summaryText = '';
+          let summaryText = "";
           if (tomorrowWeather.rain) {
-              summaryText = '☔ Rain coming tomorrow!';
+            summaryText = "☔ Rain coming tomorrow!";
           } else if (tomorrowWeather.wind) {
-              summaryText = '💨 Be prepared for a windy day ahead!';
-          } else if (tomorrowWeather.description.includes('clouds')) {
-              summaryText = '☁️ Expect partly cloudy skies tomorrow.';
+            summaryText = "💨 Be prepared for a windy day ahead!";
+          } else if (tomorrowWeather.description.includes("clouds")) {
+            summaryText = "☁️ Expect partly cloudy skies tomorrow.";
           } else {
-              summaryText = '☀️ Mostly sunny and clear day ahead.';
+            summaryText = "☀️ Mostly sunny and clear day ahead.";
           }
-          
-          forecastElement.textContent = summaryText;
 
+          forecastElement.textContent = summaryText;
         } catch (err) {
           forecastElement.textContent = "Forecast unavailable.";
           console.error("Error fetching forecast data:", err);
@@ -239,11 +303,11 @@
       // --- MAP FUNCTION (UNCHANGED) ---
 
       function displayMap(lat, lon) {
-          const mapContainer = document.getElementById("mapContainer");
-          
-          const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed`; 
-          
-          mapContainer.innerHTML = `
+        const mapContainer = document.getElementById("mapContainer");
+
+        const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed`;
+
+        mapContainer.innerHTML = `
               <iframe 
                   width="100%" 
                   height="300" 
@@ -256,35 +320,62 @@
               </iframe>
           `;
       }
-      
-      // --- TIME & WEATHER FUNCTIONS ---
+
+      // --- TIME & WEATHER FUNCTIONS (UNCHANGED) ---
 
       function generateWeatherSummary(temp, weatherDesc, isNight) {
         const desc = weatherDesc.toLowerCase();
-        let summary = '';
-        let emojis = isNight ? ' 🌙✨' : ' ☀️'; 
-        
-        let tempFeel = (temp < 10) ? 'freezing' : (temp < 18) ? 'chilly' : (temp < 25) ? 'pleasant' : 'warm';
+        let summary = "";
+        let emojis = isNight ? " 🌙✨" : " ☀️";
 
-        if (desc.includes('clear')) {
-            summary = isNight ? `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and clear night sky!` : `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and sunny day!`;
-        } else if (desc.includes('clouds')) {
-            summary = isNight ? `Overcast and dark night with patchy clouds.` : `Mildly cloudy day with ${tempFeel} air.`;
-        } else if (desc.includes('rain')) {
-            summary = `A wet, ${tempFeel} day with steady rain.`;
-            emojis = ' 🌧️☔'; 
-        } else if (desc.includes('mist') || desc.includes('fog') || desc.includes('haze')) {
-            summary = isNight ? `A ${tempFeel} hazy night with low visibility!` : `A ${tempFeel} hazy morning with a soft glow.`;
+        let tempFeel =
+          temp < 10
+            ? "freezing"
+            : temp < 18
+            ? "chilly"
+            : temp < 25
+            ? "pleasant"
+            : "warm";
+
+        if (desc.includes("clear")) {
+          summary = isNight
+            ? `${
+                tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)
+              } and clear night sky!`
+            : `${
+                tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)
+              } and sunny day!`;
+        } else if (desc.includes("clouds")) {
+          summary = isNight
+            ? `Overcast and dark night with patchy clouds.`
+            : `Mildly cloudy day with ${tempFeel} air.`;
+        } else if (desc.includes("rain")) {
+          summary = `A wet, ${tempFeel} day with steady rain.`;
+          emojis = " 🌧️☔";
+        } else if (
+          desc.includes("mist") ||
+          desc.includes("fog") ||
+          desc.includes("haze")
+        ) {
+          summary = isNight
+            ? `A ${tempFeel} hazy night with low visibility!`
+            : `A ${tempFeel} hazy morning with a soft glow.`;
         } else {
-            summary = `${tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)} and ${desc} conditions.`;
+          summary = `${
+            tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)
+          } and ${desc} conditions.`;
         }
-        
+
         return summary + emojis;
       }
 
-      function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
+      function displayLocalTime(
+        timezoneOffsetSeconds,
+        sunriseTime,
+        sunsetTime
+      ) {
         if (localTimeInterval) {
-            clearInterval(localTimeInterval);
+          clearInterval(localTimeInterval);
         }
 
         const timeElement = document.getElementById("localTime");
@@ -292,86 +383,104 @@
         const sunEventElement = document.getElementById("sunEvent");
         const sunriseElement = document.getElementById("sunriseTime");
         const sunsetElement = document.getElementById("sunsetTime");
-        
-        const weatherDesc = document.getElementById("currentWeather").textContent;
-        const temp = parseFloat(document.getElementById("temperature").textContent.replace('Temperature: ', '').replace('°C', ''));
+
+        const weatherDesc =
+          document.getElementById("currentWeather").textContent;
+        const tempElement = document.getElementById("temperatureHeading");
+        const temp = parseFloat(tempElement.textContent.replace("°C", ""));
 
         function updateClock() {
-            const utcMs = Date.now(); 
-            const localTimeMs = utcMs + (timezoneOffsetSeconds * 1000);
-            const localDate = new Date(localTimeMs);
-            const currentSecondUTC = Math.floor(localTimeMs / 1000); 
+          const utcMs = Date.now();
+          const localTimeMs = utcMs + timezoneOffsetSeconds * 1000;
+          const localDate = new Date(localTimeMs);
+          const currentSecondUTC = Math.floor(localTimeMs / 1000);
 
-            // Determine if it is night 
-            const isNight = (currentSecondUTC > sunsetTime) || (currentSecondUTC < sunriseTime);
-            
-            // NEW: Set background animation
-            setBackground(weatherDesc, isNight);
+          const isNight =
+            currentSecondUTC > sunsetTime || currentSecondUTC < sunriseTime;
 
+          setBackground(weatherDesc, isNight);
 
-            // --- 1. Update Time Display ---
-            const timeOptions = { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit', 
-                hour12: true, 
-                timeZone: 'UTC' 
-            };
-            const dateOptions = { 
-                weekday: 'short', 
-                month: 'short', 
-                day: 'numeric', 
-                timeZone: 'UTC' 
-            };
-            
-            const timeString = localDate.toLocaleTimeString('en-US', timeOptions);
-            const dateString = localDate.toLocaleDateString('en-US', dateOptions);
-            timeElement.textContent = `${dateString} | ${timeString}`;
-            
-            // --- 2. Update Sun Event Countdown ---
-            let nextEventTime, eventName, emoji;
+          // --- 1. Update Time Display ---
+          const timeOptions = {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "UTC",
+          };
+          const dateOptions = {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC",
+          };
 
-            if (currentSecondUTC < sunriseTime) {
-                eventName = "Sunrise";
-                emoji = "🌅";
-                nextEventTime = sunriseTime; 
-            } else if (currentSecondUTC < sunsetTime) {
-                eventName = "Sunset";
-                emoji = "🌇";
-                nextEventTime = sunsetTime;
-            } else {
-                eventName = "Sunrise";
-                emoji = "🌅";
-                nextEventTime = sunriseTime + 86400; 
-            }
+          const timeString = localDate.toLocaleTimeString("en-US", timeOptions);
+          const dateString = localDate.toLocaleDateString("en-US", dateOptions);
+          timeElement.textContent = `${dateString} | ${timeString}`;
 
-            const diffMs = (nextEventTime * 1000) - localTimeMs;
+          // --- 2. Update Sun Event Countdown ---
+          let nextEventTime, eventName, emoji;
 
-            if (diffMs > 0) {
-                const diffSeconds = Math.floor(diffMs / 1000);
-                const hours = Math.floor(diffSeconds / 3600);
-                const minutes = Math.floor((diffSeconds % 3600) / 60);
+          if (currentSecondUTC < sunriseTime) {
+            eventName = "Sunrise";
+            emoji = "🌅";
+            nextEventTime = sunriseTime;
+          } else if (currentSecondUTC < sunsetTime) {
+            eventName = "Sunset";
+            emoji = "🌇";
+            nextEventTime = sunsetTime;
+          } else {
+            eventName = "Sunrise";
+            emoji = "🌅";
+            nextEventTime = sunriseTime + 86400;
+          }
 
-                sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins`;
-            } else {
-                 sunEventElement.textContent = ''; 
-            }
+          const diffMs = nextEventTime * 1000 - localTimeMs;
 
+          if (diffMs > 0) {
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const hours = Math.floor(diffSeconds / 3600);
+            const minutes = Math.floor((diffSeconds % 3600) / 60);
 
-            // --- 3. Update Custom Summary ---
-            if (!isNaN(temp)) {
-                summaryElement.textContent = generateWeatherSummary(temp, weatherDesc.toLowerCase(), isNight);
-            }
+            sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins`;
+          } else {
+            sunEventElement.textContent = "";
+          }
+
+          // --- 3. Update Custom Summary ---
+          const currentTemp = parseFloat(
+            document
+              .getElementById("temperatureHeading")
+              .textContent.replace("°C", "")
+          );
+          if (!isNaN(currentTemp)) {
+            summaryElement.textContent = generateWeatherSummary(
+              currentTemp,
+              weatherDesc.toLowerCase(),
+              isNight
+            );
+          }
         }
-        
+
         // --- STATIC SUN TIME DISPLAY ---
         const sunriseDate = new Date(sunriseTime * 1000);
         const sunsetDate = new Date(sunsetTime * 1000);
-        
-        const sunTimeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
 
-        const formattedSunrise = sunriseDate.toLocaleTimeString('en-US', sunTimeOptions);
-        const formattedSunset = sunsetDate.toLocaleTimeString('en-US', sunTimeOptions);
+        const sunTimeOptions = {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "UTC",
+        };
+
+        const formattedSunrise = sunriseDate.toLocaleTimeString(
+          "en-US",
+          sunTimeOptions
+        );
+        const formattedSunset = sunsetDate.toLocaleTimeString(
+          "en-US",
+          sunTimeOptions
+        );
 
         sunriseElement.textContent = `🌅 Sunrise: ${formattedSunrise}`;
         sunsetElement.textContent = `🌇 Sunset: ${formattedSunset}`;
@@ -379,29 +488,32 @@
         updateClock();
         localTimeInterval = setInterval(updateClock, 1000);
       }
-      
+
       async function getWeather(lat, lon) {
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
         try {
           const res = await fetch(url);
           const data = await res.json();
-          
+
           if (data.main) {
             const temp = Math.round(data.main.temp);
             const weatherDesc = data.weather[0].description;
-            const timezone = data.timezone; 
-            
-            const sunriseTime = data.sys.sunrise + timezone; 
-            const sunsetTime = data.sys.sunset + timezone; 
+            const timezone = data.timezone;
 
-            document.getElementById("temperature").textContent = `Temperature: ${temp}°C`;
-            document.getElementById("currentWeather").textContent = weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
-            
+            const sunriseTime = data.sys.sunrise + timezone;
+            const sunsetTime = data.sys.sunset + timezone;
+
+            document.getElementById(
+              "temperatureHeading"
+            ).textContent = `${temp}°C`;
+            document.getElementById("currentWeather").textContent =
+              weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
+
             displayLocalTime(timezone, sunriseTime, sunsetTime);
-
           } else {
-            document.getElementById("temperature").textContent = "Weather data unavailable.";
-            document.getElementById("currentWeather").textContent = "";
+            document.getElementById("temperatureHeading").textContent = "--°C";
+            document.getElementById("currentWeather").textContent =
+              "Weather data unavailable.";
             document.getElementById("localTime").textContent = "--:--";
             document.getElementById("weatherSummary").textContent = "";
             document.getElementById("sunriseTime").textContent = "";
@@ -410,7 +522,8 @@
             if (localTimeInterval) clearInterval(localTimeInterval);
           }
         } catch (err) {
-          document.getElementById("status").textContent = "Error fetching weather data.";
+          document.getElementById("status").textContent =
+            "Error fetching weather data.";
           console.error("Error fetching weather data:", err);
         }
       }
@@ -424,11 +537,14 @@
           const data = await res.json();
           if (data.length > 0) {
             const location = data[0];
-            const display = location.state ? `${location.name}, ${location.state}, ${location.country}` : `${location.name}, ${location.country}`;
+            const display = location.state
+              ? `${location.name}, ${location.state}, ${location.country}`
+              : `${location.name}, ${location.country}`;
             document.getElementById("locationName").textContent = display;
             return display;
           } else {
-            document.getElementById("locationName").textContent = "Unknown Location";
+            document.getElementById("locationName").textContent =
+              "Unknown Location";
             return "Unknown Location";
           }
         } catch (err) {
@@ -446,36 +562,51 @@
         try {
           const res = await fetch(url);
           const data = await res.json();
-          
-          if (!data.list || !data.list[0] || !data.list[0].components || data.list[0].components.pm2_5 === undefined) {
-             aqiValueElement.textContent = "AQI: N/A";
-             meaningElement.textContent = "Data Unavailable";
-             descElement.textContent = "No recent PM2.5 reading for this location.";
-             return; 
+
+          const hasPm25Data =
+            data.list &&
+            data.list[0] &&
+            data.list[0].components &&
+            typeof data.list[0].components.pm2_5 === "number";
+
+          if (!hasPm25Data) {
+            aqiValueElement.textContent = "AQI: N/A";
+            meaningElement.textContent = "Data Unavailable";
+            descElement.textContent =
+              "No recent PM2.5 reading for this location. Try searching for a nearby major city.";
+            return;
           }
 
           const pm25 = data.list[0].components.pm2_5;
           const aqi = pm25ToAQI(pm25);
+
+          if (!isFinite(aqi)) {
+            aqiValueElement.textContent = "AQI: N/A";
+            meaningElement.textContent = "Calculation Error";
+            descElement.textContent = `Raw PM2.5 data: ${pm25}. AQI calculation failed due to invalid range.`;
+            return;
+          }
+
           const info = getAqiMeaning(aqi);
 
           aqiValueElement.textContent = `AQI: ${aqi}`;
           meaningElement.textContent = info.text;
           descElement.textContent = info.message;
         } catch (err) {
-          document.getElementById("status").textContent = "Error fetching AQI data. (Check API Key/Quota)";
+          document.getElementById("status").textContent =
+            "Error fetching AQI data. (Check API Key/Quota)";
           console.error(err);
         }
       }
-      
+
       function fetchAllData(lat, lon) {
-        document.getElementById("status").textContent = "Fetching data...";
+        document.getElementById("status").textContent = "";
         getAirQuality(lat, lon);
         getLocationName(lat, lon);
         getWeather(lat, lon);
-        getForecast(lat, lon); 
-        displayMap(lat, lon); 
+        getForecast(lat, lon);
+        displayMap(lat, lon);
       }
-
 
       // --- USER INPUT HANDLER (UNCHANGED) ---
 
@@ -483,18 +614,23 @@
         const encodedCity = encodeURIComponent(cityName);
         const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedCity}&limit=1&appid=${apiKey}`;
         try {
-          document.getElementById("status").textContent = `Searching for "${cityName}"...`;
+          document.getElementById(
+            "status"
+          ).textContent = `Searching for "${cityName}"...`;
           const res = await fetch(url);
           const data = await res.json();
-          
+
           if (data.length > 0) {
             const { lat, lon } = data[0];
             fetchAllData(lat, lon);
           } else {
-            document.getElementById("status").textContent = `Location "${cityName}" not found.`;
+            document.getElementById(
+              "status"
+            ).textContent = `Location "${cityName}" not found.`;
           }
         } catch (err) {
-          document.getElementById("status").textContent = "Error during city search.";
+          document.getElementById("status").textContent =
+            "Error during city search.";
           console.error(err);
         }
       }
@@ -504,13 +640,15 @@
         if (cityName) {
           getCoordinatesByCityName(cityName);
         } else {
-          document.getElementById("status").textContent = "Please enter a location name.";
+          document.getElementById("status").textContent =
+            "Please enter a location name.";
         }
       }
 
       function getLocation() {
         if (!navigator.geolocation) {
-          document.getElementById("status").textContent = "Geolocation not supported. Please use the search bar.";
+          document.getElementById("status").textContent =
+            "Geolocation not supported. Please use the search bar.";
           return;
         }
 
@@ -520,7 +658,8 @@
             fetchAllData(latitude, longitude);
           },
           () => {
-            document.getElementById("status").textContent = "Failed to get location. Please use the search bar.";
+            document.getElementById("status").textContent =
+              "Failed to get location. Please use the search bar.";
           }
         );
       }

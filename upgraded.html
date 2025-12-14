@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>weatherApp (v4.0)</title>
+    <link rel="stylesheet" href="upgraded_design.css">
+    <style>
+      
+    </style>
+  </head>
+  <body id="body">
+    <br>
+      <a
+        style="
+          color: white;
+          text-decoration: none;
+          font-size: 16px;
+          border: 1px 2px black;
+          background-color: #d2c456;
+          padding: 4px 50px;
+          border-radius: 40px;
+          box-shadow: 2px 2px 8px rgb(96, 121, 91);
+          font-weight: bolder;
+        "
+        href="index.html"
+        >🔄️ Switch to Original Search</a
+      >
+      <br /><br /><br>
+    <input
+      type="text"
+      id="cityInput"
+      placeholder="Enter City or Location"
+    /><br />
+    <button id="gwb" onclick="searchLocation()">🍂 Check Weather</button>
+
+    <br />
+    <br>
+    <span id="urat"></span>
+ <div
+        id="mapContainer"
+        style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
+      ></div>
+     
+      <span id="status">Detecting location...</span>
+      <h2 id="locationName"></h2>
+      <p id="localTime" style="font-size: 15px">--:--</p>
+      <h3 id="temperatureHeading"></h3>
+
+      <span id="weatherSummary" style="font-style: italic; font-weight: bold"></span><br>
+      <span id="currentWeather"></span>
+      
+      
+      <i><p id="sunEvent" style="font-size: 16px"></p></i>
+      <span id="sunriseTime"></span><br /><span id="sunsetTime"></span>
+      <p id="tomorrowForecast" style="font-style: italic"></p>
+
+     
+
+      <hr />
+
+      <h2 id="aqiValue"></h2>
+      <p id="meaning"></p>
+      <p id="desc"></p>
+    </div>
+    <script src="upgraded.js"></script>
+  </body>
+</html>

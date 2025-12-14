@@ -1,0 +1,114 @@
+/* --- Base Styles --- */
+body {
+  font-family: Arial, sans-serif;
+  color: #333;
+  background: linear-gradient(135deg, #f0f8ff, #e0ffff);
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  transition: background 3s ease-in-out, background-size 3s ease-in-out;
+  /* NEW: Center the content on the body */
+  text-align: center;
+}
+
+/* Container for visual clarity on dynamic background */
+div {
+  max-width: 600px;
+  margin: 0 auto; /* Ensures container is centered */
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  /* NEW: Center text within the container */
+  text-align: center;
+}
+
+/* Temperature Heading Style */
+#temperatureHeading {
+  font-size: 3em;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  /* Inherits text-align: center from the div */
+}
+
+/* Input and button container centering (redundant due to div center, but good practice) */
+#cityInput,
+button {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Map centering */
+#mapContainer iframe {
+  display: block;
+  margin: 0 auto;
+}
+
+/* --- Animated Background Classes (UNCHANGED) --- */
+
+/* Helper for animation */
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Clear Day: Bright blue to light gold */
+.clear-day-bg {
+  background: linear-gradient(45deg, #87ceeb, #51d3ff, #4682b4);
+  background-size: 300% 300%;
+  animation: gradientAnimation 20s ease infinite;
+}
+
+/* Clear Night: Dark blue/purple with stars effect */
+.clear-night-bg {
+  background: linear-gradient(135deg, #000033, #191970, #4b0082);
+  background-size: 300% 300%;
+  animation: gradientAnimation 30s ease infinite;
+  color: #f0f8ff;
+}
+.clear-night-bg div {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Cloudy Day: Grey/white to pale blue */
+.cloudy-day-bg {
+  background: linear-gradient(160deg, #b0c4de, #f5f5f5, #a9a9a9);
+  background-size: 200% 200%;
+  animation: gradientAnimation 40s linear infinite;
+}
+
+/* Cloudy Night: Dark grey/indigo */
+.cloudy-night-bg {
+  background: linear-gradient(135deg, #36454f, #1c2833);
+  background-size: 150% 150%;
+  animation: gradientAnimation 50s ease infinite;
+  color: #ccc;
+}
+.cloudy-night-bg div {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Rain/Mist/Haze: Muted blue-grey */
+.rain-mist-bg {
+  background: linear-gradient(180deg, #708090, #c0c0c0, #696969);
+  background-size: 200% 200%;
+  animation: gradientAnimation 35s ease infinite reverse;
+}
+#gwb {
+  padding: 3px 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgb(255, 254, 254);
+}
+#cityInput {
+  padding: 5px 15px;
+  font-size: 17px;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  font-weight: 900;
+}

@@ -135,12 +135,12 @@ if (navigator.geolocation) {
         }
         auto_city.innerHTML = `
         <span style='color:darkgreen;font-weight:500;'>Current location</span>
-        <br><br>
+        <br>
           <span style='font-size:22px'>${city}, ${
           data.sys.country
         }</span><br><br>
           <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br>
-          <span style='font-size:40px'><b>${temp.toFixed(0)}°C</b></span><br>
+          <span style='font-size:42px'><b>${temp.toFixed(0)}°C</b></span><br>
 
           <div style="margin-top:15px;font-size:14px;">
           <span><b>feels like:</b> ${data.main.feels_like.toFixed(
@@ -154,7 +154,7 @@ if (navigator.geolocation) {
           data.visibility / 1000
         } km</span> | <span><b>pressure:</b> ${
           data.main.pressure
-        } mb</span> | <span><b>clouds:</b> ${data.clouds.all}%</span>
+        } mb</span> | <span><b>clouds in sky:</b> ${data.clouds.all}%</span>
           </div>
         `;
         document.getElementById("myImage").classList.add("hidden");

@@ -191,7 +191,7 @@ async function fetchKolkataWeather() {
     const data = await res.json();
     const temp = data.main.temp;
     pop.innerHTML = `
-      <span style='font-size:18px;color:black;font-weight:600;'>⛅ Popular Location</span>
+      <span style='font-size:22px;color:black;font-weight:600;'>⛅ Popular Location</span>
       <br><br>
       <span style='font-size:16px'>🏙️ ${city}</span> : <span style='font-size:18px;'><b>${temp.toFixed(
       0

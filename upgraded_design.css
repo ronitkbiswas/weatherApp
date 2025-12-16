@@ -100,14 +100,14 @@ button {
   animation: gradientAnimation 35s ease infinite reverse;
 }
 #gwb {
-  padding: 3px 8px;
-  font-size: 16px;
+  padding: 3px 6px;
+  font-size: 15px;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgb(255, 254, 254);
 }
 #cityInput {
-  padding: 5px 15px;
-  font-size: 17px;
+  padding: 5px 5px;
+  font-size: 16px;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   font-weight: 900;

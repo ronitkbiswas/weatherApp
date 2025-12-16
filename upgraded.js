@@ -29,63 +29,6 @@ function setBackground(weatherDesc, isNight) {
   }
 }
 
-// --- AQI CALCULATION (UNCHANGED) ---
-
-function pm25ToAQI(pm25) {
-  const breakpoints = [
-    { cLow: 0, cHigh: 12, aLow: 0, aHigh: 50 },
-    { cLow: 12.1, cHigh: 35.4, aLow: 51, aHigh: 100 },
-    { cLow: 35.5, cHigh: 55.4, aLow: 101, aHigh: 150 },
-    { cLow: 55.5, cHigh: 150.4, aLow: 151, aHigh: 200 },
-    { cLow: 150.5, cHigh: 250.4, aLow: 201, aAigh: 300 },
-    { cLow: 250.5, cHigh: 500.4, aLow: 301, aAigh: 500 },
-  ];
-  for (let b of breakpoints) {
-    if (pm25 >= b.cLow && pm25 <= b.cHigh) {
-      return Math.round(
-        ((b.aHigh - b.aLow) / (b.cHigh - b.cLow)) * (pm25 - b.cLow) + b.aLow
-      );
-    }
-  }
-  return 500;
-}
-
-function getAqiMeaning(aqi) {
-  if (aqi <= 50)
-    return {
-      text: "Good",
-      message: "Air quality is excellent. Great time for outdoor activities!",
-    };
-  if (aqi <= 100)
-    return {
-      text: "Moderate",
-      message:
-        "Air quality is acceptable. Sensitive people should take it easy outdoors.",
-    };
-  if (aqi <= 150)
-    return {
-      text: "Unhealthy for Sensitive",
-      message: "Those with asthma or allergies should limit outdoor exposure.",
-    };
-  if (aqi <= 200)
-    return {
-      text: "Unhealthy",
-      message: "Air quality is poor. Avoid prolonged outdoor activity.",
-    };
-  if (aqi <= 300)
-    return {
-      text: "Very Unhealthy",
-      message:
-        "Everyone may experience health effects. Stay indoors with filtered air.",
-    };
-  return {
-    text: "Hazardous",
-    message: "Dangerous air quality! Stay indoors.",
-  };
-}
-
-// --- FORECAST FUNCTION (UNCHANGED) ---
-
 async function getForecast(lat, lon) {
   const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
   const forecastElement = document.getElementById("tomorrowForecast");
@@ -145,7 +88,6 @@ async function getForecast(lat, lon) {
     console.error("Error fetching forecast data:", err);
   }
 }
-
 // --- MAP FUNCTION (UNCHANGED) ---
 
 function displayMap(lat, lon) {

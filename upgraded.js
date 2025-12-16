@@ -156,7 +156,7 @@ function displayMap(lat, lon) {
   mapContainer.innerHTML = `
               <iframe 
                   width="100%" 
-                  height="300" 
+                  height="200" 
                   frameborder="0" 
                   scrolling="no" 
                   marginheight="0" 
@@ -366,9 +366,7 @@ async function getWeather(lat, lon) {
     console.error("Error fetching weather data:", err);
   }
 }
-
-// --- LOCATION & AQI FETCHING (UNCHANGED) ---
-
+// --- LOCATION & AQI FETCHING (UNCHANGED) --
 async function getLocationName(lat, lon) {
   const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
   try {
@@ -380,7 +378,7 @@ async function getLocationName(lat, lon) {
         ? `${location.name}, ${location.state}, ${location.country}`
         : `${location.name}, ${location.country}`;
       document.getElementById("locationName").textContent = display;
-      document.getElementById("urat").textContent = `📍You are in ${display}`;
+      document.getElementById("urat").textContent = `🏠 You are in ${display}`;
       return display;
     } else {
       document.getElementById("locationName").textContent = "Unknown Location";
@@ -392,54 +390,8 @@ async function getLocationName(lat, lon) {
   }
 }
 
-async function getAirQuality(lat, lon) {
-  const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
-  const aqiValueElement = document.getElementById("aqiValue");
-  const meaningElement = document.getElementById("meaning");
-  const descElement = document.getElementById("desc");
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const hasPm25Data =
-      data.list &&
-      data.list[0] &&
-      data.list[0].components &&
-      typeof data.list[0].components.pm2_5 === "number";
-
-    if (!hasPm25Data) {
-      aqiValueElement.textContent = "AQI: N/A";
-      meaningElement.textContent = "Data Unavailable";
-      descElement.textContent =
-        "No recent PM2.5 reading for this location. Try searching for a nearby major city.";
-      return;
-    }
-
-    const pm25 = data.list[0].components.pm2_5;
-    const aqi = pm25ToAQI(pm25);
-
-    if (!isFinite(aqi)) {
-      aqiValueElement.textContent = "AQI: N/A";
-      meaningElement.textContent = "Data Unavailable 😒";
-      return;
-    }
-
-    const info = getAqiMeaning(aqi);
-
-    aqiValueElement.textContent = `AQI: ${aqi}`;
-    meaningElement.textContent = info.text;
-    descElement.textContent = info.message;
-  } catch (err) {
-    document.getElementById("status").textContent =
-      "Error fetching AQI data. (Check API Key/Quota)";
-    console.error(err);
-  }
-}
-
 function fetchAllData(lat, lon) {
   document.getElementById("status").textContent = "";
-  getAirQuality(lat, lon);
   getLocationName(lat, lon);
   getWeather(lat, lon);
   getForecast(lat, lon);
@@ -481,14 +433,12 @@ function searchLocation() {
       "Please enter a location name.";
   }
 }
-
 function getLocation() {
   if (!navigator.geolocation) {
     document.getElementById("status").textContent =
       "Geolocation not supported. Please use the search bar.";
     return;
   }
-
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const { latitude, longitude } = pos.coords;

@@ -98,9 +98,9 @@ function displayMap(lat, lon) {
   mapContainer.innerHTML = `
               <iframe 
                   width="100%" 
-                  height="200" 
+                  height="160" 
                   frameborder="0" 
-                  scrolling="no" 
+                  scrolling="on" 
                   marginheight="0" 
                   marginwidth="0" 
                   src="https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed"

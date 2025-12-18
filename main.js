@@ -134,11 +134,9 @@ if (navigator.geolocation) {
           g = "🌙 Silent Night";
         }
         auto_city.innerHTML = `
-        <span style='color:darkgreen;font-weight:500;'>Current location</span>
+        <span style='color:darkgreen;font-weight:500;'>🏠 Current location</span>
         <br>
-          <span style='font-size:22px'>${city}, ${
-          data.sys.country
-        }</span><br><br>
+          <span style='font-size:22px'>${city}, ${data.sys.country}</span><br>
           <span style='font-size:14px'>${fullTime}</span> | <span>${g}</span><br>
           <span style='font-size:42px'><b>${temp.toFixed(0)}°C</b></span><br>
 

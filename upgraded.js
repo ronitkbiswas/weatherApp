@@ -393,5 +393,4 @@ function getLocation() {
   );
 }
 
-// Initialize on load
 getLocation();

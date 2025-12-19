@@ -42,9 +42,3 @@ this project demonstrates how to work with APIs, async functions, and DOM manipu
 
 **Ronit Biswas**
 💼 GitHub: [@ronitkbiswas](https://github.com/ronitkbiswas)
-
----
-
-## 🪪 License
-
-This project is **open-source** and available under the [MIT License](LICENSE).

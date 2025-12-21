@@ -1,7 +1,6 @@
 const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
 let localTimeInterval;
 
-// --- BACKGROUND ANIMATION LOGIC (UNCHANGED) ---
 function setBackground(weatherDesc, isNight) {
   const body = document.getElementById("body");
   const currentClass = body.className;
@@ -88,7 +87,6 @@ async function getForecast(lat, lon) {
     console.error("Error fetching forecast data:", err);
   }
 }
-// --- MAP FUNCTION (UNCHANGED) ---
 
 function displayMap(lat, lon) {
   const mapContainer = document.getElementById("mapContainer");
@@ -108,8 +106,6 @@ function displayMap(lat, lon) {
               </iframe>
           `;
 }
-
-// --- TIME & WEATHER FUNCTIONS (UNCHANGED) ---
 
 function generateWeatherSummary(temp, weatherDesc, isNight) {
   const desc = weatherDesc.toLowerCase();
@@ -183,7 +179,6 @@ function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
 
     setBackground(weatherDesc, isNight);
 
-    // --- 1. Update Time Display ---
     const timeOptions = {
       hour: "2-digit",
       minute: "2-digit",
@@ -201,7 +196,6 @@ function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
     const dateString = localDate.toLocaleDateString("en-US", dateOptions);
     timeElement.textContent = `${dateString} | ${timeString}`;
 
-    // --- 2. Update Sun Event Countdown ---
     let nextEventTime, eventName, emoji;
 
     if (currentSecondUTC < sunriseTime) {
@@ -244,8 +238,6 @@ function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
       );
     }
   }
-
-  // --- STATIC SUN TIME DISPLAY ---
   const sunriseDate = new Date(sunriseTime * 1000);
   const sunsetDate = new Date(sunsetTime * 1000);
 
@@ -308,7 +300,6 @@ async function getWeather(lat, lon) {
     console.error("Error fetching weather data:", err);
   }
 }
-// --- LOCATION & AQI FETCHING (UNCHANGED) --
 async function getLocationName(lat, lon) {
   const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
   try {
@@ -339,9 +330,6 @@ function fetchAllData(lat, lon) {
   getForecast(lat, lon);
   displayMap(lat, lon);
 }
-
-// --- USER INPUT HANDLER (UNCHANGED) ---
-
 async function getCoordinatesByCityName(cityName) {
   const encodedCity = encodeURIComponent(cityName);
   const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedCity}&limit=1&appid=${apiKey}`;

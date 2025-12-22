@@ -311,7 +311,7 @@ async function getLocationName(lat, lon) {
         ? `${location.name}, ${location.state}, ${location.country}`
         : `${location.name}, ${location.country}`;
       document.getElementById("locationName").textContent = display;
-      document.getElementById("urat").textContent = `🏠 You are in ${display}`;
+      document.getElementById("urat").textContent = `📍You are in ${display}`;
       return display;
     } else {
       document.getElementById("locationName").textContent = "Unknown Location";

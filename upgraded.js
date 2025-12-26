@@ -1,383 +1,199 @@
+/***********************
+ * CONFIG + STATE
+ ***********************/
 const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
-let localTimeInterval;
 
-function setBackground(weatherDesc, isNight) {
-  const body = document.getElementById("body");
-  const currentClass = body.className;
-  let newClass = "";
+const state = {
+  lat: null,
+  lon: null,
+  temp: null,
+  weatherDesc: "",
+  mainWeather: "",
+  timezone: 0,
+  sunrise: 0,
+  sunset: 0
+};
 
-  const desc = weatherDesc.toLowerCase();
+let clockInterval = null;
 
-  if (desc.includes("clear") || desc.includes("sun")) {
-    newClass = isNight ? "clear-night-bg" : "clear-day-bg";
+/***********************
+ * SMALL HELPERS (DRY)
+ ***********************/
+function $(id) {
+  return document.getElementById(id);
+}
+
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/***********************
+ * BACKGROUND HANDLER
+ ***********************/
+function setBackground(mainWeather, isNight) {
+  let bgClass = "cloudy-day-bg";
+
+  if (mainWeather === "Clear") {
+    bgClass = isNight ? "clear-night-bg" : "clear-day-bg";
   } else if (
-    desc.includes("rain") ||
-    desc.includes("mist") ||
-    desc.includes("fog") ||
-    desc.includes("haze")
+    mainWeather === "Rain" ||
+    mainWeather === "Drizzle" ||
+    mainWeather === "Mist" ||
+    mainWeather === "Fog"
   ) {
-    newClass = "rain-mist-bg";
-  } else if (desc.includes("cloud")) {
-    newClass = isNight ? "cloudy-night-bg" : "cloudy-day-bg";
-  } else {
-    newClass = isNight ? "cloudy-night-bg" : "cloudy-day-bg";
+    bgClass = "rain-mist-bg";
+  } else if (mainWeather === "Clouds") {
+    bgClass = isNight ? "cloudy-night-bg" : "cloudy-day-bg";
   }
 
-  if (currentClass !== newClass) {
-    body.className = newClass;
-  }
+  document.body.className = bgClass;
 }
 
-async function getForecast(lat, lon) {
-  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
-  const forecastElement = document.getElementById("tomorrowForecast");
+/***********************
+ * WEATHER SUMMARY
+ ***********************/
+function generateSummary(temp, desc, isNight) {
+  let feel =
+    temp < 10 ? "Freezing" :
+    temp < 18 ? "Chilly" :
+    temp < 25 ? "Pleasant" : "Warm";
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+  if (desc.includes("rain")) return `${feel} and rainy 🌧️`;
+  if (desc.includes("cloud")) return `${feel} with clouds ☁️`;
+  if (desc.includes("clear")) return isNight ? "Clear night 🌙" : "Sunny day ☀️";
 
-    if (!data.list) {
-      forecastElement.textContent = "Forecast unavailable.";
-      return;
-    }
-
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const tomorrowDateString = tomorrow.toISOString().split("T")[0];
-
-    let tomorrowWeather = {
-      rain: false,
-      wind: false,
-      description: "Clear",
-    };
-
-    for (let item of data.list) {
-      if (item.dt_txt.startsWith(tomorrowDateString)) {
-        const desc = item.weather[0].description.toLowerCase();
-
-        if (desc.includes("rain") || desc.includes("shower")) {
-          tomorrowWeather.rain = true;
-        }
-        if (item.wind.speed > 10) {
-          tomorrowWeather.wind = true;
-        }
-
-        if (!tomorrowWeather.rain && !tomorrowWeather.wind) {
-          tomorrowWeather.description = desc;
-        }
-      }
-    }
-
-    let summaryText = "";
-    if (tomorrowWeather.rain) {
-      summaryText = "☔ Rain coming tomorrow!";
-    } else if (tomorrowWeather.wind) {
-      summaryText = "💨 Be prepared for a windy day ahead!";
-    } else if (tomorrowWeather.description.includes("clouds")) {
-      summaryText = "☁️ Expect partly cloudy skies tomorrow.";
-    } else {
-      summaryText = "☀️ Mostly sunny and clear day ahead.";
-    }
-
-    forecastElement.textContent = summaryText;
-  } catch (err) {
-    forecastElement.textContent = "Forecast unavailable.";
-    console.error("Error fetching forecast data:", err);
-  }
+  return `${feel} weather 🌤️`;
 }
 
-function displayMap(lat, lon) {
-  const mapContainer = document.getElementById("mapContainer");
-
-  const mapUrl = `https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed`;
-
-  mapContainer.innerHTML = `
-              <iframe 
-                  width="100%" 
-                  height="160" 
-                  frameborder="0" 
-                  scrolling="on" 
-                  marginheight="0" 
-                  marginwidth="0" 
-                  src="https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed"
-                  allowfullscreen>
-              </iframe>
-          `;
-}
-
-function generateWeatherSummary(temp, weatherDesc, isNight) {
-  const desc = weatherDesc.toLowerCase();
-  let summary = "";
-  let emojis = isNight ? " 🌙✨" : " ☀️";
-
-  let tempFeel =
-    temp < 10
-      ? "freezing"
-      : temp < 18
-      ? "chilly"
-      : temp < 25
-      ? "pleasant"
-      : "warm";
-
-  if (desc.includes("clear")) {
-    summary = isNight
-      ? `${
-          tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)
-        } and clear night sky!`
-      : `${
-          tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)
-        } and sunny day!`;
-  } else if (desc.includes("clouds")) {
-    summary = isNight
-      ? `Overcast and dark night with patchy clouds.`
-      : `Mildly cloudy day with ${tempFeel} air.`;
-  } else if (desc.includes("rain")) {
-    summary = `A wet, ${tempFeel} day with steady rain.`;
-    emojis = " 🌧️☔";
-  } else if (
-    desc.includes("mist") ||
-    desc.includes("fog") ||
-    desc.includes("haze")
-  ) {
-    summary = isNight
-      ? `A ${tempFeel} hazy night with low visibility!`
-      : `A ${tempFeel} hazy morning with a soft glow.`;
-  } else {
-    summary = `${
-      tempFeel.charAt(0).toUpperCase() + tempFeel.slice(1)
-    } and ${desc} conditions.`;
-  }
-
-  return summary + emojis;
-}
-
-function displayLocalTime(timezoneOffsetSeconds, sunriseTime, sunsetTime) {
-  if (localTimeInterval) {
-    clearInterval(localTimeInterval);
-  }
-
-  const timeElement = document.getElementById("localTime");
-  const summaryElement = document.getElementById("weatherSummary");
-  const sunEventElement = document.getElementById("sunEvent");
-  const sunriseElement = document.getElementById("sunriseTime");
-  const sunsetElement = document.getElementById("sunsetTime");
-
-  const weatherDesc = document.getElementById("currentWeather").textContent;
-  const tempElement = document.getElementById("temperatureHeading");
-  const temp = parseFloat(tempElement.textContent.replace("°C", ""));
+/***********************
+ * CLOCK + TIME LOGIC
+ ***********************/
+function startClock() {
+  if (clockInterval) clearInterval(clockInterval);
 
   function updateClock() {
-    const utcMs = Date.now();
-    const localTimeMs = utcMs + timezoneOffsetSeconds * 1000;
-    const localDate = new Date(localTimeMs);
-    const currentSecondUTC = Math.floor(localTimeMs / 1000);
+    const nowUTC = Date.now();
+    const localMs = nowUTC + state.timezone * 1000;
+    const localDate = new Date(localMs);
+    const currentSeconds = Math.floor(localMs / 1000);
 
     const isNight =
-      currentSecondUTC > sunsetTime || currentSecondUTC < sunriseTime;
+      currentSeconds < state.sunrise || currentSeconds > state.sunset;
 
-    setBackground(weatherDesc, isNight);
+    setBackground(state.mainWeather, isNight);
 
-    const timeOptions = {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "UTC",
-    };
-    const dateOptions = {
+    const dateStr = localDate.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
-      day: "numeric",
-      timeZone: "UTC",
-    };
+      day: "numeric"
+    });
 
-    const timeString = localDate.toLocaleTimeString("en-US", timeOptions);
-    const dateString = localDate.toLocaleDateString("en-US", dateOptions);
-    timeElement.textContent = `${dateString} | ${timeString}`;
+    const timeStr = localDate.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
 
-    let nextEventTime, eventName, emoji;
-
-    if (currentSecondUTC < sunriseTime) {
-      eventName = "Sunrise";
-      emoji = "🌅";
-      nextEventTime = sunriseTime;
-    } else if (currentSecondUTC < sunsetTime) {
-      eventName = "Sunset";
-      emoji = "🌇";
-      nextEventTime = sunsetTime;
-    } else {
-      eventName = "Sunrise";
-      emoji = "🌅";
-      nextEventTime = sunriseTime + 86400;
-    }
-
-    const diffMs = nextEventTime * 1000 - localTimeMs;
-
-    if (diffMs > 0) {
-      const diffSeconds = Math.floor(diffMs / 1000);
-      const hours = Math.floor(diffSeconds / 3600);
-      const minutes = Math.floor((diffSeconds % 3600) / 60);
-
-      sunEventElement.textContent = `${emoji} ${eventName} in ${hours} hours ${minutes} mins`;
-    } else {
-      sunEventElement.textContent = "";
-    }
-
-    // --- 3. Update Custom Summary ---
-    const currentTemp = parseFloat(
-      document
-        .getElementById("temperatureHeading")
-        .textContent.replace("°C", "")
-    );
-    if (!isNaN(currentTemp)) {
-      summaryElement.textContent = generateWeatherSummary(
-        currentTemp,
-        weatherDesc.toLowerCase(),
-        isNight
-      );
-    }
+    $("localTime").textContent = `${dateStr} | ${timeStr}`;
+    $("weatherSummary").textContent =
+      generateSummary(state.temp, state.weatherDesc, isNight);
   }
-  const sunriseDate = new Date(sunriseTime * 1000);
-  const sunsetDate = new Date(sunsetTime * 1000);
-
-  const sunTimeOptions = {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "UTC",
-  };
-
-  const formattedSunrise = sunriseDate.toLocaleTimeString(
-    "en-US",
-    sunTimeOptions
-  );
-  const formattedSunset = sunsetDate.toLocaleTimeString(
-    "en-US",
-    sunTimeOptions
-  );
-
-  sunriseElement.textContent = `🌅 Sunrise: ${formattedSunrise}`;
-  sunsetElement.textContent = `🌇 Sunset: ${formattedSunset}`;
 
   updateClock();
-  localTimeInterval = setInterval(updateClock, 1000);
+  clockInterval = setInterval(updateClock, 1000);
 }
 
+/***********************
+ * WEATHER FETCH
+ ***********************/
 async function getWeather(lat, lon) {
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
   try {
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
     const res = await fetch(url);
     const data = await res.json();
 
-    if (data.main) {
-      const temp = Math.round(data.main.temp);
-      const weatherDesc = data.weather[0].description;
-      const timezone = data.timezone;
+    state.temp = Math.round(data.main.temp);
+    state.weatherDesc = data.weather[0].description.toLowerCase();
+    state.mainWeather = data.weather[0].main;
+    state.timezone = data.timezone;
 
-      const sunriseTime = data.sys.sunrise + timezone;
-      const sunsetTime = data.sys.sunset + timezone;
+    // Convert sunrise/sunset to LOCAL seconds
+    state.sunrise = data.sys.sunrise + state.timezone;
+    state.sunset = data.sys.sunset + state.timezone;
 
-      document.getElementById("temperatureHeading").textContent = `${temp}°C`;
-      document.getElementById("currentWeather").textContent =
-        weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
+    $("temperatureHeading").textContent = `${state.temp}°C`;
+    $("currentWeather").textContent = capitalize(data.weather[0].description);
 
-      displayLocalTime(timezone, sunriseTime, sunsetTime);
-    } else {
-      document.getElementById("temperatureHeading").textContent = "--°C";
-      document.getElementById("currentWeather").textContent =
-        "Weather data unavailable.";
-      document.getElementById("localTime").textContent = "--:--";
-      document.getElementById("weatherSummary").textContent = "";
-      document.getElementById("sunriseTime").textContent = "";
-      document.getElementById("sunsetTime").textContent = "";
-      document.getElementById("sunEvent").textContent = "";
-      if (localTimeInterval) clearInterval(localTimeInterval);
-    }
+    startClock();
   } catch (err) {
-    document.getElementById("status").textContent =
-      "Error fetching weather data.";
-    console.error("Error fetching weather data:", err);
-  }
-}
-async function getLocationName(lat, lon) {
-  const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.length > 0) {
-      const location = data[0];
-      const display = location.state
-        ? `${location.name}, ${location.state}, ${location.country}`
-        : `${location.name}, ${location.country}`;
-      document.getElementById("locationName").textContent = display;
-      document.getElementById("urat").textContent = `📍You are in ${display}`;
-      return display;
-    } else {
-      document.getElementById("locationName").textContent = "Unknown Location";
-      return "Unknown Location";
-    }
-  } catch (err) {
-    console.error("Error fetching location name:", err);
-    return "Error fetching location name";
-  }
-}
-
-function fetchAllData(lat, lon) {
-  document.getElementById("status").textContent = "";
-  getLocationName(lat, lon);
-  getWeather(lat, lon);
-  getForecast(lat, lon);
-  displayMap(lat, lon);
-}
-async function getCoordinatesByCityName(cityName) {
-  const encodedCity = encodeURIComponent(cityName);
-  const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodedCity}&limit=1&appid=${apiKey}`;
-  try {
-    document.getElementById(
-      "status"
-    ).textContent = `Searching for "${cityName}"...`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.length > 0) {
-      const { lat, lon } = data[0];
-      fetchAllData(lat, lon);
-    } else {
-      document.getElementById(
-        "status"
-      ).textContent = `Location "${cityName}" not found.`;
-    }
-  } catch (err) {
-    document.getElementById("status").textContent = "Error during city search.";
+    $("status").textContent = "Error fetching weather data.";
     console.error(err);
   }
 }
 
-function searchLocation() {
-  const cityName = document.getElementById("cityInput").value.trim();
-  if (cityName) {
-    getCoordinatesByCityName(cityName);
-  } else {
-    document.getElementById("status").textContent =
-      "Please enter a location name.";
+/***********************
+ * LOCATION NAME
+ ***********************/
+async function getLocationName(lat, lon) {
+  try {
+    const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.length) return;
+
+    const loc = data[0];
+    const name = loc.state
+      ? `${loc.name}, ${loc.state}, ${loc.country}`
+      : `${loc.name}, ${loc.country}`;
+
+    $("locationName").textContent = name;
+    $("urat").textContent = `📍 You are in ${name}`;
+  } catch (err) {
+    console.error("Location error:", err);
   }
 }
+
+/***********************
+ * MAP
+ ***********************/
+function showMap(lat, lon) {
+  $("mapContainer").innerHTML = `
+    <iframe
+      width="100%"
+      height="160"
+      src="https://maps.google.com/maps?q=${lat},${lon}&z=12&output=embed"
+      loading="lazy">
+    </iframe>
+  `;
+}
+
+/***********************
+ * ENTRY POINT
+ ***********************/
+function fetchAll(lat, lon) {
+  state.lat = lat;
+  state.lon = lon;
+
+  $("status").textContent = "";
+
+  getLocationName(lat, lon);
+  getWeather(lat, lon);
+  showMap(lat, lon);
+}
+
+/***********************
+ * GEOLOCATION
+ ***********************/
 function getLocation() {
   if (!navigator.geolocation) {
-    document.getElementById("status").textContent =
-      "Geolocation not supported. Please use the search bar.";
+    $("status").textContent = "Geolocation not supported.";
     return;
   }
+
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
-      fetchAllData(latitude, longitude);
-    },
-    () => {
-      document.getElementById("status").textContent =
-        "Failed to get location. Please use the search bar.";
-    }
+    pos => fetchAll(pos.coords.latitude, pos.coords.longitude),
+    () => $("status").textContent = "Location access denied."
   );
 }
 

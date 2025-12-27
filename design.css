@@ -53,6 +53,7 @@ body {
 .uD {
   background-color: #858484;
   padding: 2px;
+  background-origin: padding-box;
   box-sizing: border-box;
 }
 

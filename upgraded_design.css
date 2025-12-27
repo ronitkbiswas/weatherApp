@@ -5,7 +5,7 @@ body {
   background: linear-gradient(135deg, #f0f8ff, #e0ffff);
   min-height: 100vh;
   margin: 0;
-  padding: 20px;
+  padding: 0px;
   transition: background 3s ease-in-out, background-size 3s ease-in-out;
   /* NEW: Center the content on the body */
   text-align: center;

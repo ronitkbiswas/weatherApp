@@ -45,7 +45,7 @@ btn.addEventListener("click", async () => {
     //16:00 (4pm) → 18:59(7pm)	Evening
     // 19:00(7pm) → 04:59(5am) Night
     if (hours24 >= 5 && hours24 < 12) {
-      let g = "🌅 Good Morning";
+      let g = "🌅 Good Morning 🍵";
     } else if (hours24 >= 12 && hours24 < 16) {
       g = "☀️ High Noon";
     } else if (hours24 >= 16 && hours24 < 19) {
@@ -125,7 +125,7 @@ if (navigator.geolocation) {
         //16:00 (4pm) → 18:59(7pm)	Evening
         // 19:00(7pm) → 04:59(5am) Night
         if (hours24 >= 5 && hours24 < 12) {
-          let g = "🌅 Good Morning";
+          let g = "🌅 Good Morning 🍵";
         } else if (hours24 >= 12 && hours24 < 16) {
           g = "☀️ High Noon";
         } else if (hours24 >= 16 && hours24 < 19) {

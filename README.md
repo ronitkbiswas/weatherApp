@@ -1,4 +1,4 @@
-# 🌤️ Simple JavaScript Weather App
+# Javascript based weather app.
 ## 📸 Live Preview
 https://ronitkbiswas.github.io/weatherApp/
 
@@ -40,5 +40,5 @@ this project demonstrates how to work with APIs, async functions, and DOM manipu
 
 ## 🧑‍💻 Author
 
-**Ronit Biswas**
+**Ronit Kumar Biswas**
 💼 GitHub: [@ronitkbiswas](https://github.com/ronitkbiswas)

@@ -1,14 +1,17 @@
-const status = document.getElementById("status");
+function getLocation() {
+  if (!navigator.geolocation) {
+    document.getElementById("status").textContent =
+      "Geolocation not supported.";
+    return;
+  }
 
-if (!navigator.geolocation) {
-  status.textContent = "Geolocation not supported.";
-} else {
   navigator.geolocation.getCurrentPosition(
-    ({ coords }) => {
-      status.textContent = `Lat: ${coords.latitude}, Lon: ${coords.longitude}`;
-    },
+    (pos) => console.log(pos.coords.latitude, pos.coords.longitude),
     () => {
-      status.textContent = "Location denied";
+      document.getElementById("status").textContent =
+        "Failed to get location. Please use the search bar.";
     }
   );
 }
+
+getLocation();

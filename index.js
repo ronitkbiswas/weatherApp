@@ -57,10 +57,13 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
   let emojis = isNight ? " 🌙✨" : " ☀️";
 
   const tempFeel =
-    temp < 10 ? "freezing" :
-    temp < 18 ? "chilly" :
-    temp < 25 ? "pleasant" :
-    "warm";
+    temp < 10
+      ? "freezing"
+      : temp < 18
+      ? "chilly"
+      : temp < 25
+      ? "pleasant"
+      : "warm";
 
   let summary = "";
 
@@ -182,11 +185,21 @@ async function getWeather(lat, lon) {
 
   $("sunriseTime").textContent = `🌅 Sunrise: ${new Date(
     (data.sys.sunrise + tz) * 1000
-  ).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "UTC" })}`;
+  ).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  })}`;
 
   $("sunsetTime").textContent = `🌇 Sunset: ${new Date(
     (data.sys.sunset + tz) * 1000
-  ).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "UTC" })}`;
+  ).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  })}`;
 
   startLocalClock(tz, data.sys.sunrise + tz, data.sys.sunset + tz, desc);
 }
@@ -218,11 +231,13 @@ async function getForecast(lat, lon) {
     }
   }
 
-  $("tomorrowForecast").textContent =
-    rain ? "☔ Rain coming tomorrow!" :
-    wind ? "💨 Be prepared for a windy day ahead!" :
-    desc.includes("cloud") ? "☁️ Expect partly cloudy skies tomorrow." :
-    "☀️ Mostly sunny and clear day ahead.";
+  $("tomorrowForecast").textContent = rain
+    ? "☔ Rain coming tomorrow!"
+    : wind
+    ? "💨 Be prepared for a windy day ahead!"
+    : desc.includes("cloud")
+    ? "☁️ Expect partly cloudy skies tomorrow."
+    : "☀️ Mostly sunny and clear day ahead.";
 }
 
 /* =======================

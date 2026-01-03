@@ -66,7 +66,7 @@ button {
 
 /* Clear Night: Dark blue/purple with stars effect */
 .clear-night-bg {
-  background: linear-gradient(135deg, #000033, #191970, #4b0082);
+  background: linear-gradient(135deg, #000033, #3b3bcf, #4b0082);
   background-size: 300% 300%;
   animation: gradientAnimation 30s ease infinite;
   color: #f0f8ff;
@@ -95,7 +95,7 @@ button {
 
 /* Rain/Mist/Haze: Muted blue-grey */
 .rain-mist-bg {
-  background: linear-gradient(180deg, #708090, #c0c0c0, #696969);
+  background: linear-gradient(180deg, #3d4751, #c0c0c0, #696969);
   background-size: 200% 200%;
   animation: gradientAnimation 35s ease infinite reverse;
 }

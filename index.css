@@ -14,6 +14,7 @@ header {
   width: 100%;
   background-color: #000000;
   position: fixed;
+  padding: auto;
 }
 footer {
   margin: 0;
@@ -147,7 +148,7 @@ button {
   font-weight: 900;
 }
 .heading {
-  font-size: 25px;
+  font-size: 22px;
   margin-top: 8px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   color: rgb(255, 255, 255);

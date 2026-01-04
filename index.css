@@ -1,4 +1,3 @@
-/* --- Base Styles --- */
 body {
   font-family: Arial, sans-serif;
   color: #333;
@@ -7,29 +6,25 @@ body {
   margin: 0;
   padding: 0px;
   transition: background 3s ease-in-out, background-size 3s ease-in-out;
-  /* NEW: Center the content on the body */
+
   text-align: center;
 }
 
-/* Container for visual clarity on dynamic background */
 div {
   max-width: 600px;
-  margin: 0 auto; /* Ensures container is centered */
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  /* NEW: Center text within the container */
+
   text-align: center;
 }
 
-/* Temperature Heading Style */
 #temperatureHeading {
   font-size: 3em;
   font-weight: bold;
   margin: 0 0 5px 0;
-  /* Inherits text-align: center from the div */
 }
 
-/* Input and button container centering (redundant due to div center, but good practice) */
 #cityInput,
 button {
   text-align: center;

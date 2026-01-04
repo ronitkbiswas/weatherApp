@@ -3,6 +3,7 @@
   color: rgb(0, 0, 0);
 }
 #cityIp {
+  border-radius: 20px;
   padding: 5px 20px;
   font-size: 17px;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",

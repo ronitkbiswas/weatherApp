@@ -9,7 +9,13 @@ body {
 
   text-align: center;
 }
-
+header {
+  margin: 0;
+  width: 100%;
+  background-color: #000033;
+  padding: 5px;
+  position: fixed;
+}
 div {
   max-width: 600px;
   margin: 0 auto;

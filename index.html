@@ -4,46 +4,51 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>weatherApp (v5.0)</title>
-     <link
+    <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-       href="https://www.svgrepo.com/show/532040/cloud-rain-alt-1.svg"
+      href="https://www.svgrepo.com/show/532040/cloud-rain-alt-1.svg"
     />
-    <link rel="stylesheet" href="index.css">
-    
-    <style>
-      
-    </style>
+    <link rel="stylesheet" href="index.css" />
+
+    <style></style>
   </head>
-  <body id="body">
-       <h2 class="heading"><span style="font-size: 30px;">🌠</span> Weather App (v5.0) <span style="font-size: 30px;">☁️</span></h2>
-     
-    <input
-      type="text"
-      id="cityInput"
-      placeholder="Search a place..."
-    /><br />
-    <button id="gwb" onclick="searchLocation()">🍂 Check Weather</button><br>
-    <span style="font-size: 15px;" id="urat"></span>
- <div
+  <header>
+    <h2 class="heading">
+        <span style="font-size: 30px">🌠</span> Weather App (v5.0)
+        <span style="font-size: 30px">☁️</span>
+      </h2>
+  </header>
+    <body id="body">
+      
+<br><br><br><br><br>
+      <input type="text" id="cityInput" placeholder="Search a place..." /><br />
+      <button id="gwb" onclick="searchLocation()">🍂 Check Weather</button
+      ><br />
+      <span style="font-size: 15px" id="urat"></span>
+      <div
         id="mapContainer"
         style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
       ></div>
-     
-      <span id="status">🪄 Getting your location.. Please wait 😊🖐️</span>
-      <h2 id="locationName" style="font-size: 22px;"></h2>
-      <span id="localTime" style="font-size: 15px">--:--</span>
-      <h3 id="temperatureHeading" style="font-size: 50px;"></h3>
 
-      <span id="weatherSummary" style="font-style: italic; font-weight:bold"></span> 
+      <span id="status">🪄 Getting your location.. Please wait 😊🍂</span>
+      <h2 id="locationName" style="font-size: 22px"></h2>
+      <span id="localTime" style="font-size: 15px">--:--</span>
+      <h3 id="temperatureHeading" style="font-size: 50px"></h3>
+
+      <span
+        id="weatherSummary"
+        style="font-style: italic; font-weight: bold"
+      ></span>
       <span id="currentWeather"></span>
-    
+
       <i><p id="sunEvent" style="font-size: 16px"></p></i>
       <span id="sunriseTime"></span><br /><span id="sunsetTime"></span>
       <p id="tomorrowForecast" style="font-style: italic"></p>
-      <hr /><br>
-       <a
+      <hr />
+      <br />
+      <a
         style="
           color: rgb(255, 254, 254);
           text-decoration: none;
@@ -56,10 +61,9 @@
           font-weight: bolder;
         "
         href="upgraded.html"
-        >🔄️ Switch to Basic</a><br><br><br>
+        >🔄️ Switch to Basic</a
+      ><br /><br /><br />
     </div>
     <script src="index.js"></script>
   </body>
-
 </html>
-

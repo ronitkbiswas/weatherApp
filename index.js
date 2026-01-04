@@ -256,7 +256,7 @@ async function getLocationName(lat, lon) {
     : `${loc.name}, ${loc.country}`;
 
   $("locationName").textContent = display;
-  $("urat").textContent = `📍You are in ${display}`;
+  $("urat").textContent = `📌 You are in ${display}`;
 }
 
 /* =======================

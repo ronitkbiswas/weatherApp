@@ -181,7 +181,7 @@ async function getWeather(lat, lon) {
   // const windSpeed = data.wind.speed;
   const desc = data.weather[0].description;
   const tz = data.timezone;
-  $("feelsLike").textContent = `Feels Like: ${feelsLike}°C`;
+  $("feelsLike").textContent = `🌡️ Feels Like: ${feelsLike}°C`;
   $("temperatureHeading").textContent = `${temp}°C`;
   $("currentWeather").textContent = capitalize(desc);
   // ------------------------------------------
@@ -201,9 +201,17 @@ async function getWeather(lat, lon) {
   const clouds = data.clouds?.all ?? "N/A";
 
   $("otherDetails").innerHTML = `
-  <div>Wind: ${windDeg}</div>
-  <div>Clouds: ${clouds}</div>
-`;
+  <div>
+  🔻Min: ${tempMin.toFixed(0)}°C
+  🔺Max: ${tempMax.toFixed(0)}°C  
+  💧 Humidity: ${humidity}% <br>
+  🧭 Pressure: ${pressure} mb
+  ☁️ Clouds: ${clouds}%
+  🌬️ Wind: ${windSpeedKmH} km/h<br>
+  💨 Gust: ${windGust}
+  👀 Visibility: ${visibilityKm} km
+  Wind: ${windDeg}
+  </div>`;
 
   // $("otherDetails").innerHTML = `
   //         <span style="color:darkgreen;font-weight:500;">🏠 Current location</span><br>

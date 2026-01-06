@@ -177,9 +177,10 @@ async function getWeather(lat, lon) {
   if (!data.main) return;
 
   const temp = Math.round(data.main.temp);
+  const feelsLike = Math.round(data.main.feels_like);
   const desc = data.weather[0].description;
   const tz = data.timezone;
-
+  $("feelsLike").textContent = `Feels Like: ${feelsLike}°C`;
   $("temperatureHeading").textContent = `${temp}°C`;
   $("currentWeather").textContent = capitalize(desc);
 
@@ -266,7 +267,7 @@ function displayMap(lat, lon) {
   $("mapContainer").innerHTML = `
     <iframe
       width="100%"
-      height="160"
+      height="140"
       frameborder="0"
       src="https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed">
     </iframe>

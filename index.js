@@ -201,14 +201,17 @@ async function getWeather(lat, lon) {
 
   $("otherDetails").innerHTML = `
   <div>
-  🔻Min: ${tempMin.toFixed(0)}°C
-  🔺Max: ${tempMax.toFixed(0)}°C  
+☁️ Clouds in sky: ${clouds}%<br>
+👀 Visibility: ${visibilityKm} km
+🌬️ Wind: ${windSpeedKmH} km/h<br>
+  🔻 Minimum temperature: ${tempMin.toFixed(0)}°C
+  🔺 Maximum temperature: ${tempMax.toFixed(0)}°C  
   💧 Humidity: ${humidity}% <br>
   🧭 Pressure: ${pressure} mb
-  ☁️ Clouds: ${clouds}%
-  🌬️ Wind: ${windSpeedKmH} km/h<br>
+  
+  <br>
   💨 Gust: ${windGust}
-  👀 Visibility: ${visibilityKm} km
+  
   </div>`;
 
   // $("otherDetails").innerHTML = `

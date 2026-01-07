@@ -2,14 +2,14 @@
    CONFIG
 ======================= */
 const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
-let localTimeInterval;
+let localTimeInterval = null;
 
 /* =======================
    UTILITIES
 ======================= */
 const $ = (id) => document.getElementById(id);
 
-function capitalize(text) {
+function capitalize(text = "") {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
@@ -71,7 +71,7 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
     summary = isNight
       ? `${capitalize(tempFeel)} and clear night sky!`
       : `${capitalize(tempFeel)} and sunny day!`;
-  } else if (desc.includes("clouds")) {
+  } else if (desc.includes("cloud")) {
     summary = isNight
       ? "Overcast and dark night with patchy clouds."
       : `Mildly cloudy day with ${tempFeel} air.`;
@@ -162,88 +162,60 @@ function startLocalClock(timezoneOffset, sunrise, sunset, weatherDesc) {
 }
 
 /* =======================
-   API FETCHERS
+   API HELPERS
 ======================= */
 async function fetchJSON(url) {
   const res = await fetch(url);
   return res.json();
 }
 
+/* =======================
+   WEATHER DATA
+======================= */
 async function getWeather(lat, lon) {
+  $("status").textContent = "🌍 Fetching weather data...";
+
   const data = await fetchJSON(
     `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
   );
 
-  if (!data.main) return;
+  if (!data || !data.main) {
+    $("status").textContent = "❌ Failed to load weather data.";
+    return;
+  }
+
+  // ✅ clear status ONLY after success
+  $("status").textContent = "";
 
   const temp = Math.round(data.main.temp);
   const feelsLike = Math.round(data.main.feels_like);
-  // const windSpeed = data.wind.speed;
   const desc = data.weather[0].description;
   const tz = data.timezone;
-  $("feelsLike").textContent = `🌡️ Feels Like: ${feelsLike}°C`;
+
   $("temperatureHeading").textContent = `${temp}°C`;
+  $("feelsLike").textContent = `🌡️ Feels Like: ${feelsLike}°C`;
   $("currentWeather").textContent = capitalize(desc);
-  // ------------------------------------------
-  const tempMin = data.main.temp_min;
-  const tempMax = data.main.temp_max;
+
   const humidity = data.main.humidity;
   const pressure = data.main.pressure;
-
-  const windSpeedMS = data.wind?.speed ?? 0;
-  const windSpeedKmH = (windSpeedMS * 3.6).toFixed(1);
-  const windGust = data.wind?.gust ?? "N/A";
-
+  const clouds = data.clouds?.all ?? "N/A";
   const visibilityKm = data.visibility
     ? (data.visibility / 1000).toFixed(1)
     : "N/A";
-  const clouds = data.clouds?.all ?? "N/A";
+  const windSpeedKmH = ((data.wind?.speed ?? 0) * 3.6).toFixed(1);
+  const windGust = data.wind?.gust ?? "N/A";
 
   $("otherDetails").innerHTML = `
-  <div style="padding:10px">
-☁️ Clouds in sky: ${clouds}%
-👀 Visibility: ${visibilityKm} km<br>
-🌬️ Wind: ${windSpeedKmH} km/h
-💨 Gust: ${windGust} <br> 
-  💧 Humidity: ${humidity}%
-  🧭 Pressure: ${pressure} mb
-  <br>
-  </div>`;
+    <div style="padding:10px">
+      ☁️ Clouds: ${clouds}%<br>
+      👀 Visibility: ${visibilityKm} km<br>
+      🌬️ Wind: ${windSpeedKmH} km/h<br>
+      💨 Gust: ${windGust}<br>
+      💧 Humidity: ${humidity}%<br>
+      🧭 Pressure: ${pressure} mb
+    </div>
+  `;
 
-  // $("otherDetails").innerHTML = `
-  //         <span style="color:darkgreen;font-weight:500;">🏠 Current location</span><br>
-  //         <span style="font-size:22px">${city}, ${country}</span><br>
-  //         <span style="font-size:14px">${fullTime}</span> | <span>${g}</span><br>
-
-  //         <span style="font-size:42px"><b>${temp.toFixed(0)}°C</b></span><br>
-  //         <span>${weatherMain} — ${description}</span><br>
-
-  //         <div style="margin-top:12px;font-size:14px;line-height:1.6">
-  //           🌡️ Feels like: ${feelsLike.toFixed(0)}°C |
-  //           🔻 Min: ${tempMin.toFixed(0)}°C |
-  //           🔺 Max: ${tempMax.toFixed(0)}°C <br>
-
-  //           💧 Humidity: ${humidity}% |
-  //           🧭 Pressure: ${pressure} mb |
-  //           ☁️ Clouds: ${clouds}% <br>
-
-  //           🌬️ Wind: ${windSpeedKmH} km/h (${windDeg}°) |
-  //           💨 Gust: ${windGust} <br>
-
-  //           👀 Visibility: ${visibilityKm} km <br>
-
-  //           🌧️ Rain (1h): ${rain1h} mm |
-  //           🌧️ Rain (3h): ${rain3h} mm <br>
-
-  //           ❄️ Snow (1h): ${snow1h} mm |
-  //           ❄️ Snow (3h): ${snow3h} mm <br>
-
-  //           🌅 Sunrise: ${sunrise} |
-  //           🌇 Sunset: ${sunset}
-  //         </div>
-  //       `;
-
-  //-----------------------------------
   $("sunriseTime").textContent = `🌅 Sunrise: ${new Date(
     (data.sys.sunrise + tz) * 1000
   ).toLocaleTimeString("en-US", {
@@ -265,6 +237,9 @@ async function getWeather(lat, lon) {
   startLocalClock(tz, data.sys.sunrise + tz, data.sys.sunset + tz, desc);
 }
 
+/* =======================
+   FORECAST
+======================= */
 async function getForecast(lat, lon) {
   const data = await fetchJSON(
     `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
@@ -286,7 +261,7 @@ async function getForecast(lat, lon) {
   for (const item of data.list) {
     if (item.dt_txt.startsWith(target)) {
       const d = item.weather[0].description.toLowerCase();
-      if (d.includes("rain") || d.includes("shower")) rain = true;
+      if (d.includes("rain")) rain = true;
       if (item.wind.speed > 10) wind = true;
       if (!rain && !wind) desc = d;
     }
@@ -295,14 +270,14 @@ async function getForecast(lat, lon) {
   $("tomorrowForecast").textContent = rain
     ? "☔ Rain coming tomorrow!"
     : wind
-    ? "💨 Be prepared for a windy day ahead!"
+    ? "💨 Windy day ahead!"
     : desc.includes("cloud")
-    ? "☁️ Expect partly cloudy skies tomorrow."
-    : "☀️ Mostly sunny and clear day ahead.";
+    ? "☁️ Partly cloudy tomorrow."
+    : "☀️ Mostly sunny day ahead.";
 }
 
 /* =======================
-   LOCATION
+   LOCATION + MAP
 ======================= */
 async function getLocationName(lat, lon) {
   const data = await fetchJSON(
@@ -312,41 +287,36 @@ async function getLocationName(lat, lon) {
   if (!data.length) return;
 
   const loc = data[0];
-  const display = loc.state
+  $("locationName").textContent = loc.state
     ? `${loc.name}, ${loc.state}, ${loc.country}`
     : `${loc.name}, ${loc.country}`;
-
-  $("locationName").textContent = display;
-  // $("urat").textContent = `📌 You are in ${display}`;
 }
 
-/* =======================
-   MAP
-======================= */
 function displayMap(lat, lon) {
   $("mapContainer").innerHTML = `
     <iframe
       width="100%"
       height="140"
       frameborder="0"
-      src="https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=12&output=embed">
-    </iframe>
-  `;
+      src="https://maps.google.com/maps?q=${lat},${lon}&z=12&output=embed">
+    </iframe>`;
 }
 
 /* =======================
    ORCHESTRATION
 ======================= */
 function fetchAllData(lat, lon) {
-  $("status").textContent = "";
   getLocationName(lat, lon);
   getWeather(lat, lon);
   getForecast(lat, lon);
   displayMap(lat, lon);
 }
 
+/* =======================
+   SEARCH
+======================= */
 async function getCoordinatesByCityName(city) {
-  $("status").textContent = `Searching for "${city}"...`;
+  $("status").textContent = `🔍 Searching for "${city}"...`;
 
   const data = await fetchJSON(
     `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
@@ -355,7 +325,7 @@ async function getCoordinatesByCityName(city) {
   );
 
   if (!data.length) {
-    $("status").textContent = `Location "${city}" not found.`;
+    $("status").textContent = `❌ Location "${city}" not found.`;
     return;
   }
 
@@ -364,25 +334,28 @@ async function getCoordinatesByCityName(city) {
 
 function searchLocation() {
   const city = $("cityInput").value.trim();
-  city
-    ? getCoordinatesByCityName(city)
-    : ($("status").textContent = "Please enter a location name.");
+  if (!city) {
+    $("status").textContent = "⚠️ Please enter a location name.";
+    return;
+  }
+  getCoordinatesByCityName(city);
 }
 
 /* =======================
    INIT
 ======================= */
 function initGeolocation() {
+  $("status").textContent = "🪄 Getting your location... Please wait 😊🍂";
+
   if (!navigator.geolocation) {
-    $("status").textContent = "Geolocation not supported.";
+    $("status").textContent = "❌ Geolocation not supported.";
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
     (pos) => fetchAllData(pos.coords.latitude, pos.coords.longitude),
     () => {
-      $("status").textContent =
-        "Failed to get location. Please use the search bar.";
+      $("status").textContent = "❌ Location access denied. Use search.";
     }
   );
 }

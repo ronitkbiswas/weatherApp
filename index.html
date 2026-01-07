@@ -4,71 +4,94 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>weatherApp (v5.0)</title>
+
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
       href="https://www.svgrepo.com/show/532040/cloud-rain-alt-1.svg"
     />
-    <link rel="stylesheet" href="index.css" />
-    <script src="index.js"></script>
-    <style></style>
-  </head>
-  <header>
-   <a href="/weatherApp" style="text-decoration: none;">
-    <h2 class="heading">
-        <span style="font-size: 30px">🌠</span> Weather App (v5.0)
-        <span style="font-size: 30px">☁️</span>
-      </h2></a>
-  </header>
-    <body id="body">
-      <span id="status">🪄 Getting your location.. Please wait 😊🍂</span>
-<br>
-<br><br><br>
 
-      <input type="text" id="cityInput" placeholder="Search a place..." /><br />
-      <button id="gwb" onclick="searchLocation()">🍂 Check Weather</button
-      >
-      <h2 id="locationName" style="font-size: 22px"></h2>
-      <span id="localTime" style="font-size: 14px">--:--</span>
-      <h3 id="temperatureHeading" style="font-size: 50px"></h3>
-      <span id="feelsLike" style="font-size: 20px;">---</span><br><br>
-      <span
-        id="weatherSummary"
-        style="font-style: italic; font-weight: bold"
-      ></span><br><span id="currentWeather"></span>
-      <!-- <span style="font-size: 15px" id="urat"></span> -->
-      <div
-        id="mapContainer"
-        style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
-      ></div>
-      <span id="otherDetails"></span>
-      
-      <i><p id="sunEvent" style="font-size: 16px"></p></i>
-      <span id="sunriseTime"></span><br /><span id="sunsetTime"></span>
-      <p id="tomorrowForecast" style="font-style: italic"></p>
-      <hr />
-      <br />
-      <a
-        style="
-          color: rgb(255, 254, 254);
-          text-decoration: none;
-          font-size: 15px;
-          border: 1px 2px black;
-          background-color: #c9b837;
-          padding: 1px 20px;
-          border-radius: 40px;
-          box-shadow: 2px 2px 8px rgb(254, 254, 254);
-          font-weight: bolder;
-        "
-        href="upgraded.html"
-        >🔄️ Switch to Basic</a
-      ><br /><br /><br />
-    </div>
+    <link rel="stylesheet" href="index.css" />
+
+    <!-- ✅ defer is CRITICAL -->
+    <script src="index.js" defer></script>
+  </head>
+
+  <body id="body">
+    <header>
+      <a href="/weatherApp" style="text-decoration: none">
+        <h2 class="heading">
+          <span style="font-size: 30px">🌠</span>
+          Weather App (v5.0)
+          <span style="font-size: 30px">☁️</span>
+        </h2>
+      </a>
+    </header>
+
+    <!-- ✅ THIS WILL NOW SHOW -->
+    <span id="status">🪄 Getting your location.. Please wait 😊🍂</span>
+
+    <br /><br /><br /><br />
+
+    <input type="text" id="cityInput" placeholder="Search a place..." /><br />
+    <button id="gwb" onclick="searchLocation()">🍂 Check Weather</button>
+
+    <h2 id="locationName" style="font-size: 22px"></h2>
+    <span id="localTime" style="font-size: 14px">--:--</span>
+
+    <h3 id="temperatureHeading" style="font-size: 50px"></h3>
+    <span id="feelsLike" style="font-size: 20px">---</span><br /><br />
+
+    <span
+      id="weatherSummary"
+      style="font-style: italic; font-weight: bold"
+    ></span>
+    <br />
+    <span id="currentWeather"></span>
+
+    <div
+      id="mapContainer"
+      style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
+    ></div>
+
+    <span id="otherDetails"></span>
+
+    <i><p id="sunEvent" style="font-size: 16px"></p></i>
+    <span id="sunriseTime"></span><br />
+    <span id="sunsetTime"></span>
+
+    <p id="tomorrowForecast" style="font-style: italic"></p>
+
+    <hr />
+    <br />
+
+    <a
+      style="
+        color: white;
+        text-decoration: none;
+        font-size: 15px;
+        background-color: #c9b837;
+        padding: 1px 20px;
+        border-radius: 40px;
+        box-shadow: 2px 2px 8px white;
+        font-weight: bolder;
+      "
+      href="upgraded.html"
+      >🔄️ Switch to Basic</a
+    >
+
+    <br /><br /><br />
+
     <footer>
-      <span style="font-size: 12px;font-family:Arial, Helvetica, sans-serif;color:white;">Written in JavaScript | Made by Ronit 🔒</span><br>
-      <span style="font-size: 10px;font-family:Arial, Helvetica, sans-serif;">
-        <a href="#" style="color: white;text-decoration: none;">Privacy Policy</a> | <a style="color: white;text-decoration: none;" href="#">Terms of Use</a> | <a style="color: white;text-decoration: none;" href="#">Contact us</a>
+      <span style="font-size: 12px; color: white">
+        Written in JavaScript | Made by Ronit 🔒
+      </span>
+      <br />
+      <span style="font-size: 10px">
+        <a href="#" style="color: white">Privacy Policy</a> |
+        <a href="#" style="color: white">Terms of Use</a> |
+        <a href="#" style="color: white">Contact us</a>
       </span>
     </footer>
   </body>

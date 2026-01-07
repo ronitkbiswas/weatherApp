@@ -200,18 +200,14 @@ async function getWeather(lat, lon) {
   const clouds = data.clouds?.all ?? "N/A";
 
   $("otherDetails").innerHTML = `
-  <div>
-☁️ Clouds in sky: ${clouds}%<br>
-👀 Visibility: ${visibilityKm} km
-🌬️ Wind: ${windSpeedKmH} km/h<br>
-  🔻 Minimum temperature: ${tempMin.toFixed(0)}°C
-  🔺 Maximum temperature: ${tempMax.toFixed(0)}°C  
-  💧 Humidity: ${humidity}% <br>
+  <div style="padding:10px">
+☁️ Clouds in sky: ${clouds}%
+👀 Visibility: ${visibilityKm} km<br>
+🌬️ Wind: ${windSpeedKmH} km/h
+💨 Gust: ${windGust} <br> 
+  💧 Humidity: ${humidity}%
   🧭 Pressure: ${pressure} mb
-  
   <br>
-  💨 Gust: ${windGust}
-  
   </div>`;
 
   // $("otherDetails").innerHTML = `

@@ -274,8 +274,8 @@ async function getForecast(lat, lon) {
     : wind
     ? "💨 Windy day ahead!"
     : desc.includes("cloud")
-    ? "☁️ Partly cloudy tomorrow."
-    : "☀️ Mostly sunny day ahead.";
+    ? "☁️ Partly cloudy tomorrow.."
+    : "☀️ Mostly sunny day ahead..";
 }
 
 /* =======================

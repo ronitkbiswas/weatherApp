@@ -40,6 +40,7 @@ div {
 button {
   text-align: center;
   margin-bottom: 10px;
+  width: 50%;
 }
 
 /* Map centering */
@@ -106,7 +107,7 @@ button {
   animation: gradientAnimation 35s ease infinite reverse;
 }
 #gwb {
-  width: 130px;
+  /* width: 130px; */
   padding: 5px 0;
   font-size: 13px;
   font-weight: 600;
@@ -120,6 +121,7 @@ button {
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease,
     box-shadow 0.2s ease;
+  width: 50%;
 }
 /* hover */
 #gwb:hover {

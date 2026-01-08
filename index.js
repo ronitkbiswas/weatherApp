@@ -202,6 +202,8 @@ async function getWeather(lat, lon) {
   const visibilityKm = data.visibility
     ? (data.visibility / 1000).toFixed(1)
     : "N/A";
+  // const windDeg = data.wind?.degree;
+  const windDeg = data.wind?.deg ?? "N/A";
   const windSpeedKmH = ((data.wind?.speed ?? 0) * 3.6).toFixed(1);
   const windGust = data.wind?.gust ?? "N/A";
 
@@ -209,7 +211,7 @@ async function getWeather(lat, lon) {
     <div style="padding:2px">
       ☁️ Clouds in sky: ${clouds}%<br>
       👀 Visibility: ${visibilityKm} km<br>
-      🌬️ Wind: ${windSpeedKmH} km/h<br>
+      🌬️ Wind: ${windSpeedKmH} km/h (${windDeg}°)<br>
       💨 Gust: ${windGust}<br>
       💧 Humidity: ${humidity}%<br>
       🧭 Pressure: ${pressure} mb

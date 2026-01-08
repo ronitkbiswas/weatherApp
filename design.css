@@ -2,6 +2,19 @@
   font-size: 25px;
   color: rgb(0, 0, 0);
 }
+header {
+  margin: 0;
+  width: 100%;
+
+  background-color: #000000;
+  position: fixed;
+  padding: auto;
+}
+footer {
+  margin: 0;
+  background-color: #000000;
+  padding: 15px;
+}
 #cityIp {
   border-radius: 20px;
   padding: 5px 20px;
@@ -45,10 +58,15 @@
 }
 
 body {
+  font-family: Arial, sans-serif;
+  color: #333;
+  background: linear-gradient(135deg, #f0f8ff, #e0ffff);
+  min-height: 100vh;
   margin: 0;
-  padding: 0;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  background-color: #7f7e7e;
+  padding: 0px;
+  transition: background 3s ease-in-out, background-size 3s ease-in-out;
+
+  text-align: center;
 }
 
 .uD {

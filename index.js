@@ -206,8 +206,8 @@ async function getWeather(lat, lon) {
   const windGust = data.wind?.gust ?? "N/A";
 
   $("otherDetails").innerHTML = `
-    <div style="padding:5px">
-      ☁️ Clouds: ${clouds}%<br>
+    <div style="padding:2px">
+      ☁️ Clouds in sky: ${clouds}%<br>
       👀 Visibility: ${visibilityKm} km<br>
       🌬️ Wind: ${windSpeedKmH} km/h<br>
       💨 Gust: ${windGust}<br>

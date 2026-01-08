@@ -158,3 +158,69 @@ button {
 .heading:hover {
   cursor: pointer;
 }
+.switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 5px 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+
+  color: #fff;
+  text-decoration: none;
+  border-radius: 999px;
+
+  background: linear-gradient(135deg, #f5d547, #c9b837);
+  box-shadow: 0 8px 20px rgba(201, 184, 55, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.switch-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(201, 184, 55, 0.6),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+  filter: brightness(1.05);
+}
+
+.switch-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px rgba(201, 184, 55, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.search-btn {
+  display: inline-flex;
+  justify-content: center; /* horizontal center */
+  align-items: center; /* vertical center */
+
+  padding: 10px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+
+  color: #fff;
+  text-decoration: none;
+  border-radius: 999px;
+
+  background: linear-gradient(135deg, #f5d547, #c9b837);
+  box-shadow: 0 8px 20px rgba(201, 184, 55, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(201, 184, 55, 0.6),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+  filter: brightness(1.05);
+}
+
+.search-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 14px rgba(201, 184, 55, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}

@@ -37,6 +37,7 @@
     <input type="text" id="cityInput" placeholder="Search a place..." /><button
       id="gwb"
       onclick="searchLocation()"
+      class="search-btn"
     >
       🍂 Check
     </button>
@@ -46,7 +47,9 @@
     <span id="localTime" style="font-size: 14px">--:--</span>
     <br /><br />
     <h3 id="temperatureHeading" style="font-size: 60px"></h3>
-    <span id="feelsLike" style="font-size: 20px">🪄 Getting your location.. Please wait ☺️</span><br /><br />
+    <span id="feelsLike" style="font-size: 20px"
+      >🪄 Getting your location.. Please wait ☺️</span
+    ><br /><br />
 
     <span
       id="weatherSummary"
@@ -70,20 +73,7 @@
     <hr />
     <br />
 
-    <a
-      style="
-        color: white;
-        text-decoration: none;
-        font-size: 15px;
-        background-color: #c9b837;
-        padding: 1px 20px;
-        border-radius: 40px;
-        box-shadow: 2px 2px 8px white;
-        font-weight: bolder;
-      "
-      href="upgraded.html"
-      >🔄️ Switch to Basic</a
-    >
+    <a href="upgraded.html" class="switch-btn">🔄️ Switch to Basic</a>
 
     <br /><br /><br />
 

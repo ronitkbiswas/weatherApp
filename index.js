@@ -90,7 +90,7 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
     summary = `${capitalize(tempFeel)} and ${desc} conditions.`;
   }
 
-  return summary + emojis;
+  return emojis + " " + summary;
 }
 
 /* =======================
@@ -194,7 +194,7 @@ async function getWeather(lat, lon) {
 
   $("temperatureHeading").textContent = `${temp}°C`;
   $("feelsLike").textContent = `🌡️ Feels Like: ${feelsLike}°C`;
-  $("currentWeather").textContent = capitalize(desc);
+  // $("currentWeather").textContent = capitalize(desc);
 
   const humidity = data.main.humidity;
   const pressure = data.main.pressure;

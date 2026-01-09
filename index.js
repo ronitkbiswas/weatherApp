@@ -69,14 +69,14 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
 
   if (desc.includes("clear")) {
     summary = isNight
-      ? `${capitalize(tempFeel)} and clear night sky!`
-      : `${capitalize(tempFeel)} and sunny day!`;
+      ? `${capitalize(tempFeel)} and clear night sky..`
+      : `${capitalize(tempFeel)} and sunny day..`;
   } else if (desc.includes("cloud")) {
     summary = isNight
-      ? "Overcast and dark night with patchy clouds."
-      : `Mildly cloudy day with ${tempFeel} air.`;
+      ? "Overcast and dark night with patchy clouds.."
+      : `Mildly cloudy day with ${tempFeel} air..`;
   } else if (desc.includes("rain")) {
-    summary = `A wet, ${tempFeel} day with steady rain.`;
+    summary = `A wet, ${tempFeel} day with steady rain..`;
     emojis = " 🌧️☔";
   } else if (
     desc.includes("mist") ||
@@ -84,10 +84,10 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
     desc.includes("haze")
   ) {
     summary = isNight
-      ? `A ${tempFeel} hazy night with low visibility!`
-      : `A ${tempFeel} hazy morning with a soft glow.`;
+      ? `A ${tempFeel} hazy night with low visibility..`
+      : `A ${tempFeel} hazy morning with a soft glow..`;
   } else {
-    summary = `${capitalize(tempFeel)} and ${desc} conditions.`;
+    summary = `${capitalize(tempFeel)} and ${desc} conditions..`;
   }
 
   return emojis + " " + summary;

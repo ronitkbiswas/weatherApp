@@ -209,12 +209,12 @@ async function getWeather(lat, lon) {
 
   $("otherDetails").innerHTML = `
     <div style="padding:2px">
-      ☁️ Clouds in sky: ${clouds}%<br>
-      👀 Visibility: ${visibilityKm} km<br>
-      🌬️ Wind: ${windSpeedKmH} km/h (${windDeg}°)<br>
-      💨 Gust: ${windGust}<br>
-      💧 Humidity: ${humidity}%<br>
-      🧭 Pressure: ${pressure} mb
+      ☁️ Clouds in Sky: ${clouds}%<br>
+      👁️ Visibility is around ${visibilityKm} km<br>
+      🍃 Wind Speed is around ${windSpeedKmH} km/h (${windDeg}°)<br>
+      💨 Sudden Wind (Gust): ${windGust}<br>
+      💧 Water in Air (Humidity): ${humidity}%<br>
+      🧭 Air Pressure on you: ${pressure} mb
     </div>
   `;
 

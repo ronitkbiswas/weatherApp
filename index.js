@@ -74,7 +74,7 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
       : temp < 15
       ? "cold"
       : temp < 20
-      ? "cool"
+      ? "chilly"
       : temp < 25
       ? "pleasant"
       : temp < 30

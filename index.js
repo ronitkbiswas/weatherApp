@@ -211,10 +211,10 @@ async function getWeather(lat, lon) {
     <div style="padding:5px; background-color:none;font-family:Tahoma;">
       ☁️ ${clouds}% clouds in sky right now<br>
       👁️ Visibility is around ${visibilityKm} km<br>
-      🍃 Wind Speed is around ${windSpeedKmH} km/h (${windDeg}°)<br>
+      🍃 Wind Speed is around ${windSpeedKmH} km/h (Wind coming from ${windDeg}°)<br>
       💨 Sudden Wind (Gust): ${windGust}<br>
-      💧 Water in Air (Humidity): ${humidity}%<br>
-      🧭 Air Pressure on you: ${pressure} mb
+      💧 Around ${humidity}% water in air (Humidity)<br>
+      🧭 Air Pressure on you is around ${pressure} mb
     </div>
   `;
   $("sunriseTime").textContent = `🌅 Sunrise: ${new Date(

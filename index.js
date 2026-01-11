@@ -57,13 +57,39 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
   let emojis = isNight ? " 🌙✨" : " ☀️";
 
   const tempFeel =
-    temp < 10
-      ? "freezing"
-      : temp < 18
-      ? "chilly"
+    temp < -20
+      ? "inhuman cold"
+      : temp < -15
+      ? "polar nightmare"
+      : temp < -10
+      ? "arctic cold"
+      : temp < -5
+      ? "bitter freeze"
+      : temp < 0
+      ? "ice cold"
+      : temp < 5
+      ? "near freezing"
+      : temp < 10
+      ? "very cold"
+      : temp < 15
+      ? "cold"
+      : temp < 20
+      ? "cool"
       : temp < 25
       ? "pleasant"
-      : "warm";
+      : temp < 30
+      ? "warm"
+      : temp < 35
+      ? "hot"
+      : temp < 40
+      ? "very hot"
+      : temp < 45
+      ? "scorching"
+      : temp < 50
+      ? "extreme heat"
+      : temp <= 50
+      ? "lethal heat"
+      : "thermodynamic chaos";
 
   let summary = "";
 
@@ -269,12 +295,12 @@ async function getForecast(lat, lon) {
   }
 
   $("tomorrowForecast").textContent = rain
-    ? "☔ Rain coming tomorrow!"
+    ? "Tomorrow's Forecast: ☔ Rain coming tomorrow!"
     : wind
-    ? "💨 Windy day ahead!"
+    ? "Tomorrow's Forecast: 💨 Windy day ahead!"
     : desc.includes("cloud")
-    ? "☁️ Partly cloudy tomorrow.."
-    : "☀️ Mostly sunny day ahead..";
+    ? "Tomorrow's Forecast: ☁️ Partly cloudy tomorrow.."
+    : "Tomorrow's Forecast: ☀️ Mostly sunny day ahead..";
 }
 
 /* =======================

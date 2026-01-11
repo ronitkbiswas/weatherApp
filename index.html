@@ -13,9 +13,6 @@
     />
 
     <link rel="stylesheet" href="index.css" />
-
-    <!-- ✅ defer is CRITICAL -->
-    <script src="index.js" defer></script>
   </head>
 
   <body id="body">
@@ -29,7 +26,6 @@
       </a>
     </header>
 
-    <!-- ✅ THIS WILL NOW SHOW -->
     <span id="status">🪄 Getting your location.. Please wait 😊🍂</span>
 
     <br /><br /><br /><br />
@@ -40,7 +36,7 @@
       class="search-btn"
     >
       🍂 Check Weather</button
-    ><br />
+    ><br /><br />
     <span id="localTime" style="font-size: 14px">--:--</span>
     <h3 id="temperatureHeading" style="font-size: 60px"></h3>
     <span id="feelsLike" style="font-size: 20px">
@@ -94,5 +90,6 @@
         <a href="#" style="color: white">Contact us</a>
       </span>
     </footer>
+    <script src="index.js" defer></script>
   </body>
 </html>

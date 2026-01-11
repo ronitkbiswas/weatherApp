@@ -208,8 +208,8 @@ async function getWeather(lat, lon) {
   const windGust = data.wind?.gust ?? "N/A";
 
   $("otherDetails").innerHTML = `
-    <div style="padding:2px">
-      ☁️ Clouds in Sky: ${clouds}%<br>
+    <div style="padding:5px; background-color:none;font-family:Tahoma;">
+      ☁️ ${clouds}% clouds in sky right now<br>
       👁️ Visibility is around ${visibilityKm} km<br>
       🍃 Wind Speed is around ${windSpeedKmH} km/h (${windDeg}°)<br>
       💨 Sudden Wind (Gust): ${windGust}<br>

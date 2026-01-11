@@ -217,7 +217,6 @@ async function getWeather(lat, lon) {
       🧭 Air Pressure on you: ${pressure} mb
     </div>
   `;
-
   $("sunriseTime").textContent = `🌅 Sunrise: ${new Date(
     (data.sys.sunrise + tz) * 1000
   ).toLocaleTimeString("en-US", {

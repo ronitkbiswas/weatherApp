@@ -1,41 +1,65 @@
 <!-- modal content start -->
 <div id="myModal" class="modal">
-
   <!-- Modal content -->
   <div class="modal-content">
     <span class="close">&times;</span>
-    <p>Some text in the Modal..</p>
+    <div style="font-size: 16px; color: red">
+      <span>
+        ⚠️ The development of this app has been temporarily paused. It will
+        began soon in 4 months. <br />Meanwhile enjoy what you're seeing at this
+        point. 😊
+      </span>
+    </div>
+    <br /><br /><br />
+    <div style="font-size: 14px">
+      <span><strong>🪄 Generating a random advice for you..</strong></span
+      ><br /><br />
+      <span
+        id="advice"
+        style="
+          color: black;
+          font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+            'Lucida Sans', Arial, sans-serif;
+        "
+      ></span>
+    </div>
   </div>
-
 </div>
-
 <script>
-// Get the modal
-var modal = document.getElementById("myModal");
-
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal 
-window.onload = function () {
-  modal.style.display = "block";
-};
-
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
+  async function getAdvice() {
+    const res = await fetch("https://api.adviceslip.com/advice");
+    if (!res.ok) console.log("HTTP Error");
+    const data = await res.json();
+    document.getElementById("advice").textContent = data.slip.advice;
   }
-}
+
+  // api calling ends
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("myBtn");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks the button, open the modal
+  window.onload = function () {
+    modal.style.display = "block";
+    getAdvice();
+  };
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
 </script>
 
 <!-- modal content end -->
@@ -71,11 +95,8 @@ window.onclick = function(event) {
 
     <br /><br /><br /><br />
 
-    <input type="text" id="cityInput" placeholder="Search a place..." /><button
-      id="gwb"
-      onclick="searchLocation()"
-      class="search-btn"
-    >
+    <input type="text" id="cityInput" placeholder="Search a place..." />
+    <br /><button id="gwb" onclick="searchLocation()" class="search-btn">
       🍂 Check Weather</button
     ><br /><br />
     <span id="localTime" style="font-size: 14px">--:--</span>
@@ -139,4 +160,3 @@ window.onclick = function(event) {
     <script src="index.js" defer></script>
   </body>
 </html>
-

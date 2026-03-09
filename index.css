@@ -6,7 +6,6 @@ body {
   margin: 0;
   padding: 0px;
   transition: background 3s ease-in-out, background-size 3s ease-in-out;
-
   text-align: center;
 }
 header {
@@ -26,31 +25,25 @@ div {
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
   text-align: center;
 }
-
 #temperatureHeading {
   font-size: 3em;
   font-weight: bold;
   margin: 0 0 5px 0;
 }
-
 #cityInput,
 button {
   text-align: center;
   margin-bottom: 10px;
   width: 50%;
 }
-
 /* Map centering */
 #mapContainer iframe {
   display: block;
   margin: 0 auto;
 }
-
 /* --- Animated Background Classes (UNCHANGED) --- */
-
 /* Helper for animation */
 @keyframes gradientAnimation {
   0% {
@@ -112,10 +105,8 @@ button {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.5px;
-
   background: #ffffff;
   color: #111;
-
   border: 1px solid #111;
   border-radius: 4px;
   cursor: pointer;
@@ -162,20 +153,16 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   padding: 5px 10px;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.4px;
-
   color: #fff;
   text-decoration: none;
   border-radius: 999px;
-
   background: linear-gradient(135deg, #f5d547, #c9b837);
   box-shadow: 0 8px 20px rgba(201, 184, 55, 0.45),
     inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>weatherApp ~ V6.0</title>
+    <meta charset="UFT-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--https://cdn-icons-png.flaticon.com/512/19015/19015169.png-->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://ronitkbiswas.github.io/weatherApp/files/icon.png"
+    />
+    <link rel="stylesheet" href="design.css" />
+    <!-- <link rel="stylesheet" href="upgraded_design.css" /> -->
+    <!-- <script src="main.js"></script> -->
+  </head>
+  <body>
+    <center>
+      <header>
+        <a href="/weatherApp" style="text-decoration: none">
+          <h2 class="heading" ; style="color: white">
+            <span style="font-size: 30px; color: white">🌠</span>
+            Weather App (v6.0)
+            <span style="font-size: 30px">☁️</span>
+          </h2>
+        </a>
+      </header>
+      <br /><br /><br /><br />
+      <div class="lD">
+        <img
+          id="myImage"
+          class="hidden"
+          src="https://ronitkbiswas.github.io/weatherApp/files/loading.gif"
+          style="width: 35px"
+        />
+        <p id="auto_city"></p>
+      </div>
+      <div class="uD">
+        <h3 class="heading">Weather App (v5.0) ☁️</h3>
+        <input type="text" id="cityIp" placeholder="Search a city..." />
+        <br /><br />
+        <button type="button" id="getWeatherBtn">🍂 Check Weather</button>
+        <br /><br />
+        <img
+          id="myImageUp"
+          class="hidden"
+          src="https://ronitkbiswas.github.io/weatherApp/files/loading.gif"
+          style="width: 35px"
+        />
+        <p id="result">Enter a City and Check weather...</p>
+      </div>
+      <br />
+      <a
+        style="
+          color: white;
+          text-decoration: none;
+          font-size: 16px;
+          border: 1px 2px black;
+          background-color: #bdab29;
+          padding: 4px 50px;
+          border-radius: 40px;
+          box-shadow: 2px 2px 8px rgb(255, 255, 255);
+          font-weight: bolder;
+        "
+        href="index.html"
+        >💎 Experience a better search</a
+      >
+      <br /><br />
+      <!-- popular locations -->
+      <div id="popDiv">
+        <!--kolkata-->
+        <p id="pop"></p>
+        <!-- sikkim -->
+        <p id="pop2"></p>
+        <!-- Ranaghat -->
+        <p id="pop3"></p>
+        <!-- Darjeeling -->
+        <p id="pop4"></p>
+        <br />
+        <!-- popular locations -->
+      </div>
+      <br />
+
+      <br /><br />
+
+      <footer>
+        <span style="font-size: 12px; color: white">
+          Written in JavaScript | Made by Ronit 🔒
+        </span>
+        <br />
+        <span style="font-size: 10px">
+          <a href="#" style="color: white">Privacy Policy</a> |
+          <a href="#" style="color: white">Terms of Use</a> |
+          <a href="#" style="color: white">Contact us</a>
+        </span>
+      </footer>
+    </center>
+    <script src="upgrade.js"></script>
+  </body>
+</html>

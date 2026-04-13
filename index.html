@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WeatherApp V:6.0</title>
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://www.svgrepo.com/show/532040/cloud-rain-alt-1.svg"
+    />
+
+    <link rel="stylesheet" href="index.css" />
+  </head>
+
+  <body id="body">
+    <header>
+      <a href="/weatherApp" style="text-decoration: none">
+        <h2 class="heading">
+          <span style="font-size: 30px">🌠</span>
+          Weather App (v6.0)
+          <span style="font-size: 30px">☁️</span>
+        </h2>
+      </a>
+    </header>
+
+    <span id="status">🪄 Getting your location.. Please wait 😊🍂</span>
+
+    <br /><br /><br /><br />
+
+    <input type="text" id="cityInput" placeholder="Search a place..." />
+    <br /><button id="gwb" onclick="searchLocation()" class="search-btn">
+      🍂 Check Weather</button
+    ><br /><br />
+    <span id="localTime" style="font-size: 14px">--:--</span>
+    <h3 id="temperatureHeading" style="font-size: 60px"></h3>
+    <span id="feelsLike" style="font-size: 14px">
+      <img
+        src="https://ronitkbiswas.github.io/weatherApp/files/locationMarkGif.gif"
+        width="50px"
+        height="50px"
+        alt="loading gif image"
+      />
+      <br />
+      🪄 Getting your location..
+      <br /><br />
+      Please wait.. 🧑‍💻</span
+    ><br /><br />
+
+    <span
+      id="weatherSummary"
+      style="font-style: italic; font-weight: normal"
+    ></span>
+    <br />
+    <!-- trying to add hourly weather DID NOT WORK-->
+    <!-- <div>
+      <p id="tempHistory">9PM : 10°C | 10PM : 12°C | 11PM : 15°C</p>
+    </div> -->
+
+    <!-- <span id="currentWeather"></span><br /><br /> --><br />
+    <span id="locationName" style="font-size: 20px; font-weight: bolder"></span>
+    <br />
+    <div
+      id="mapContainer"
+      style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
+    ></div>
+    <span id="otherDetails"></span>
+
+    <i><p id="sunEvent" style="font-size: 16px"></p></i>
+    <span id="sunriseTime"></span><br />
+    <span id="sunsetTime"></span>
+
+    <p id="tomorrowForecast" style="font-style: italic"></p>
+
+    <hr />
+    <br />
+
+    <a href="upgraded.html" class="switch-btn">🔄️ Switch to Basic</a>
+
+    <br /><br /><br />
+
+    <footer>
+      <span style="font-size: 12px; color: white">
+        Written in JavaScript | Made by Ronit 🔒
+      </span>
+      <br />
+      <span style="font-size: 10px">
+        <a href="#" style="color: white">Privacy Policy</a> |
+        <a href="#" style="color: white">Terms of Use</a> |
+        <a href="#" style="color: white">Contact us</a>
+      </span>
+    </footer>
+    <script src="index.js" defer></script>
+  </body>
+</html>

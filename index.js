@@ -1,6 +1,5 @@
 /* =======================
    CONFIG
-will add tailwind css to this....
 ======================= */
 const apiKey = "b782ee4ad515b759b84bb4c98d77b48e";
 let localTimeInterval = null;
@@ -58,39 +57,22 @@ function generateWeatherSummary(temp, weatherDesc, isNight) {
   let emojis = isNight ? " 🌙✨" : " ☀️";
 
   const tempFeel =
-    temp < -20
-      ? "inhuman cold"
-      : temp < -15
-      ? "polar nightmare"
-      : temp < -10
-      ? "arctic cold"
-      : temp < -5
-      ? "bitter freeze"
-      : temp < 0
-      ? "ice cold"
-      : temp < 5
-      ? "near freezing"
-      : temp < 10
-      ? "very cold"
-      : temp < 15
-      ? "cold"
-      : temp < 20
-      ? "chilly"
-      : temp < 25
-      ? "pleasant"
-      : temp < 30
-      ? "warm"
-      : temp < 35
-      ? "hot"
-      : temp < 40
-      ? "very hot"
-      : temp < 45
-      ? "scorching"
-      : temp < 50
-      ? "extreme heat"
-      : temp <= 50
-      ? "lethal heat"
-      : "thermodynamic chaos";
+    temp < -20 ? "inhuman cold" :
+    temp < -15 ? "polar nightmare" :
+    temp < -10 ? "arctic cold" :
+    temp < -5 ? "bitter freeze" :
+    temp < 0 ? "ice cold" :
+    temp < 5 ? "near freezing" :
+    temp < 10 ? "very cold" :
+    temp < 15 ? "cold" :
+    temp < 20 ? "chilly" :
+    temp < 25 ? "pleasant" :
+    temp < 30 ? "warm" :
+    temp < 35 ? "hot" :
+    temp < 40 ? "very hot" :
+    temp < 45 ? "scorching" :
+    temp < 50 ? "extreme heat" :
+    "thermodynamic chaos";
 
   let summary = "";
 
@@ -211,7 +193,6 @@ async function getWeather(lat, lon) {
     return;
   }
 
-  // ✅ clear status ONLY after success
   $("status").textContent = "";
 
   const temp = Math.round(data.main.temp);
@@ -221,7 +202,6 @@ async function getWeather(lat, lon) {
 
   $("temperatureHeading").textContent = `${temp}°C`;
   $("feelsLike").textContent = `🌡️Feels Like: ${feelsLike}°C`;
-  // $("currentWeather").textContent = capitalize(desc);
 
   const humidity = data.main.humidity;
   const pressure = data.main.pressure;
@@ -229,22 +209,22 @@ async function getWeather(lat, lon) {
   const visibilityKm = data.visibility
     ? (data.visibility / 1000).toFixed(1)
     : "N/A";
-  // const windDeg = data.wind?.degree;
   const windDeg = data.wind?.deg ?? "N/A";
   const windSpeedKmH = ((data.wind?.speed ?? 0) * 3.6).toFixed(1);
   const windGust = data.wind?.gust ?? "N/A";
 
   $("otherDetails").innerHTML = `
-    <div style="padding:5px; background-color:none;font-family:Tahoma;">
-      ☁️ ${clouds}% clouds in sky right now<br>
-      👁️ Visibility is around ${visibilityKm} km<br>
-      🍃 Wind Speed is around ${windSpeedKmH} km/h (Wind coming from ${windDeg}°)<br>
-      💨 Sudden Wind (Gust): ${windGust}<br>
-      💧 Around ${humidity}% water in air (Humidity)<br>
-      🧭 Air Pressure on you is around ${pressure} mb
+    <div style="padding:5px;font-family:Tahoma;">
+      ☁️ ${clouds}% clouds<br>
+      👁️ ${visibilityKm} km visibility<br>
+      🍃 ${windSpeedKmH} km/h (Dir ${windDeg}°)<br>
+      💨 Gust: ${windGust}<br>
+      💧 ${humidity}% humidity<br>
+      🧭 ${pressure} mb
     </div>
   `;
-  $("sunriseTime").textContent = `🌅 Sunrise: ${new Date(
+
+  $("sunriseTime").textContent = `🌅 ${new Date(
     (data.sys.sunrise + tz) * 1000
   ).toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -253,7 +233,7 @@ async function getWeather(lat, lon) {
     timeZone: "UTC",
   })}`;
 
-  $("sunsetTime").textContent = `🌇 Sunset: ${new Date(
+  $("sunsetTime").textContent = `🌇 ${new Date(
     (data.sys.sunset + tz) * 1000
   ).toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -266,8 +246,37 @@ async function getWeather(lat, lon) {
 }
 
 /* =======================
-   FORECAST
+   LOCATION + MAP
 ======================= */
+async function getLocationName(lat, lon) {
+  const data = await fetchJSON(
+    `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`
+  );
+
+  if (!data.length) return;
+
+  const loc = data[0];
+  $("locationName").textContent = loc.state
+    ? `${loc.name}, ${loc.state}, ${loc.country}`
+    : `${loc.name}, ${loc.country}`;
+}
+
+function displayMap(lat, lon) {
+  $("mapContainer").innerHTML = `
+    <iframe width="100%" height="140"
+      src="https://maps.google.com/maps?q=${lat},${lon}&z=12&output=embed">
+    </iframe>`;
+}
+
+/* =======================
+   ORCHESTRATION
+======================= */
+function fetchAllData(lat, lon) {
+  getLocationName(lat, lon);
+  getWeather(lat, lon);
+  getForecast(lat, lon); // 👈 THIS LINE
+  displayMap(lat, lon);
+}
 async function getForecast(lat, lon) {
   const data = await fetchJSON(
     `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
@@ -296,55 +305,18 @@ async function getForecast(lat, lon) {
   }
 
   $("tomorrowForecast").textContent = rain
-    ? "Tomorrow's Forecast: ☔ Rain coming tomorrow!"
+    ? "Tomorrow: ☔ Rain"
     : wind
-    ? "Tomorrow's Forecast: 💨 Windy day ahead!"
+    ? "Tomorrow: 💨 Windy"
     : desc.includes("cloud")
-    ? "Tomorrow's Forecast: ☁️ Partly cloudy tomorrow.."
-    : "Tomorrow's Forecast: ☀️ Mostly sunny day ahead..";
+    ? "Tomorrow: ☁️ Cloudy"
+    : "Tomorrow: ☀️ Sunny";
 }
-
-/* =======================
-   LOCATION + MAP
-======================= */
-async function getLocationName(lat, lon) {
-  const data = await fetchJSON(
-    `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`
-  );
-
-  if (!data.length) return;
-
-  const loc = data[0];
-  $("locationName").textContent = loc.state
-    ? `${loc.name}, ${loc.state}, ${loc.country}`
-    : `${loc.name}, ${loc.country}`;
-}
-
-function displayMap(lat, lon) {
-  $("mapContainer").innerHTML = `
-    <iframe
-      width="100%"
-      height="140"
-      frameborder="0"
-      src="https://maps.google.com/maps?q=${lat},${lon}&z=12&output=embed">
-    </iframe>`;
-}
-
-/* =======================
-   ORCHESTRATION
-======================= */
-function fetchAllData(lat, lon) {
-  getLocationName(lat, lon);
-  getWeather(lat, lon);
-  getForecast(lat, lon);
-  displayMap(lat, lon);
-}
-
 /* =======================
    SEARCH
 ======================= */
 async function getCoordinatesByCityName(city) {
-  $("status").textContent = `🔍 Searching for "${city}"...`;
+  $("status").textContent = `🔍 Searching "${city}"...`;
 
   const data = await fetchJSON(
     `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
@@ -353,17 +325,18 @@ async function getCoordinatesByCityName(city) {
   );
 
   if (!data.length) {
-    $("status").textContent = `❌ Location "${city}" not found.`;
+    $("status").textContent = `❌ Location not found.`;
     return;
   }
 
   fetchAllData(data[0].lat, data[0].lon);
 }
 
+// ✅ THIS FIXES YOUR BUTTON
 function searchLocation() {
   const city = $("cityInput").value.trim();
   if (!city) {
-    $("status").textContent = "⚠️ Please enter a location name.";
+    $("status").textContent = "⚠️ Enter a location.";
     return;
   }
   getCoordinatesByCityName(city);
@@ -373,18 +346,16 @@ function searchLocation() {
    INIT
 ======================= */
 function initGeolocation() {
-  $("status").textContent = "🪄 Getting your location... Please wait 😊🍂";
+  $("status").textContent = "🪄 Getting location...";
 
   if (!navigator.geolocation) {
-    $("status").textContent = "❌ Geolocation not supported.";
+    $("status").textContent = "❌ Not supported.";
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
     (pos) => fetchAllData(pos.coords.latitude, pos.coords.longitude),
-    () => {
-      $("status").textContent = "❌ Location access denied. Use search.";
-    }
+    () => $("status").textContent = "❌ Location denied."
   );
 }
 

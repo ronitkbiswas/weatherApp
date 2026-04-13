@@ -220,7 +220,7 @@ async function getWeather(lat, lon) {
   const tz = data.timezone;
 
   $("temperatureHeading").textContent = `${temp}°C`;
-  $("feelsLike").textContent = `🌡️ Feels Like: ${feelsLike}°C`;
+  $("feelsLike").textContent = `🌡️Feels Like: ${feelsLike}°C`;
   // $("currentWeather").textContent = capitalize(desc);
 
   const humidity = data.main.humidity;

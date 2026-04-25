@@ -54,7 +54,7 @@ function applyBackground(desc, isNight) {
 ======================= */
 function generateWeatherSummary(temp, weatherDesc, isNight) {
   const desc = weatherDesc.toLowerCase();
-  let emojis = isNight ? " 🌙✨" : " ☀️";
+  let emojis = isNight ? " 🌙 🌠 " : " ☀️";
 
   const tempFeel =
     temp < -20 ? "inhuman cold" :

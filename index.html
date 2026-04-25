@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WeatherApp V:6.0</title>
+    <title>WeatherApp</title>
 
     <link
       rel="icon"
@@ -20,7 +20,7 @@
       <a href="/weatherApp" style="text-decoration: none">
         <h2 class="heading">
           <span style="font-size: 30px">🌠</span>
-          Weather App (v6.0)
+          Weather App
           <span style="font-size: 30px">☁️</span>
         </h2>
       </a>
@@ -33,21 +33,26 @@
     <input type="text" id="cityInput" placeholder="Search a place..." />
     <br /><button id="gwb" onclick="searchLocation()" class="search-btn">
       🍂 Check Weather</button
-    ><br /><br />
-    <span id="localTime" style="font-size: 14px">--:--</span>
+    ><br /> 
+
+    <!-- Sat, Apr 25 | 10:02 PM -->
+    <span id="localTime" style="font-size: 15px">--:--</span>
+<br><br>
+    <!-- 29°C -->
     <h3 id="temperatureHeading" style="font-size: 60px"></h3>
-    <span id="feelsLike" style="font-size: 14px">
+
+    <!-- 🌡️Feels Like: 36°C -->
+    <span id="feelsLike" style="font-size: 17px">
+
+      <!-- LOADING SCREEN -->
       <img
         src="https://ronitkbiswas.github.io/weatherApp/files/locationMarkGif.gif"
         width="50px"
         height="50px"
         alt="loading gif image"
       />
-      <br />
-      🪄 Getting your location..
-      <br /><br />
-      Please wait.. 🧑‍💻</span
-    ><br /><br />
+    <br /> 🪄 Getting your location.. <br /><br />
+      Please wait.. 🧑‍💻</span><br /><br />
 
     <span
       id="weatherSummary"
@@ -58,14 +63,19 @@
     <!-- <div>
       <p id="tempHistory">9PM : 10°C | 10PM : 12°C | 11PM : 15°C</p>
     </div> -->
-
     <!-- <span id="currentWeather"></span><br /><br /> --><br />
+    
+    <!-- New Town, West Bengal, IN -->
     <span id="locationName" style="font-size: 20px; font-weight: bolder"></span>
     <br />
+
+    <!-- Map Container -->
     <div
       id="mapContainer"
       style="margin-top: 15px; margin-bottom: 15px; border: 1px solid #ccc"
     ></div>
+
+    <!-- other detail box -->
     <span id="otherDetails"></span>
 
     <i><p id="sunEvent" style="font-size: 16px"></p></i>
